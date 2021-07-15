@@ -852,12 +852,11 @@
                 return {
                     nowDate: '',
                     weatherData: {
-                        city: '成都',
-                        nowNum: 28,
-                        maxNum: 32,
-                        minNum: 25,
-                        week: '',
-                        weatherStatus: '阴'
+                        city: '',
+                        nowNum: 0,
+                        maxNum: 0,
+                        minNum: 0,
+                        weatherStatus: ''
                     },
                 }
             },
@@ -906,7 +905,7 @@
                     return fmt;
                 },
 
-                /*  // 调用天气预报api
+                 // 调用天气预报api
                 async getWeather() {
                     const res = await $.ajax({
                         type: "GET",
@@ -915,14 +914,13 @@
                         dataType: "json",
                         success: function(data) {}
                     });
-
                     this.weatherData.city = res.city
                     this.weatherData.nowNum = res.tem
                     this.weatherData.maxNum = res.tem1
                     this.weatherData.minNum = res.tem2
                     this.weatherData.weatherStatus = res.wea
                 },
- */
+
                 weatherDrag() {
                     $(function () {
                         $('.weather').draggable();
@@ -936,7 +934,7 @@
             },
             created() {
 
-                // this.getWeather()
+                this.getWeather()
                 setInterval(() => {
                     this.getWeather();
                 }, 3600000);
