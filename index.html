@@ -1,0 +1,3078 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>信息发布</title>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="./iconfont/iconfont.css">
+    <script src="./iconfont/iconfont.js"></script>
+    <script src='js/vue.js'></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="./easyui/jquery.easyui.min.js"></script>
+</head>
+
+<body>
+    <div id='app'>
+        <div class="container">
+            <!-- 头部区域开始 -->
+            <header class="head">
+                <div>
+                    <span>信息发布</span>
+                </div>
+            </header>
+            <!-- 头部区域结束 -->
+
+            <!-- 主体区域开始 -->
+            <div class="main">
+                <!-- 左侧工具栏 -->
+                <div class="left">
+                    <div class="insert">
+                        <ul class="icons_lists">
+
+                            <li draggable="true" name="myrectangle" @dragstart="dragstart" @drop="drop">
+                                <span class="icon iconfont">&#xe602;</span>
+                                <div class="name">矩形</div>
+                            </li>
+                            <li draggable="true" name="myimage" @dragstart="dragstart" @drop="drop">
+                                <span class="icon iconfont">&#xe629;</span>
+                                <div class="name">图片</div>
+                            </li>
+                            <li draggable="true" name="myvideo" @dragstart="dragstart" @drop="drop">
+                                <span class="icon iconfont">&#xe646;</span>
+                                <div class="name">视频</div>
+                            </li>
+                        </ul>
+
+                    </div>
+                    <!-- 画布颜色 -->
+                    <div class="canvaColor">
+                        <span> 画布颜色：</span><input type="color" value="#00355F" @input="handleCanvaChange">
+                    </div>
+                    <!-- 选择模板 -->
+                    <div class="dropdown">
+                        <button class="btn  dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="true">
+                            选择模板
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li><a name="defaultTemplate" @click="templateClick">默认模板</a></li>
+                            <li><a name="mytemplate1" @click="templateClick">模板1</a></li>
+                            <li><a name="mytemplate2" @click="templateClick">模板2</a></li>
+                        </ul>
+                    </div>
+                    <!-- 快速选择 -->
+                    <div class="dropdown">
+                        <button class="btn  dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="true">
+                            快速选择
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li><a name="mymeetingtitle" @click="handleClick">会议标题</a></li>
+                            <li><a name="myconferee" @click="handleClick">参会人员</a></li>
+                            <li><a name="mymeetinglists" @click="handleClick">会议列表</a></li>
+                            <li><a name="myoffice" @click="handleClick">办公室使用状态</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- 预览 -->
+                    <button title="预览" id="preview" type="button" class="btn btn-info" @click="previewClick">预览</button>
+                    <button title="发布" id="publish" type="button" class="btn btn-info" @click="publishClick">发布</button>
+                </div>
+                <!-- 中部内容栏 -->
+
+                <div class="center" @drop="drop" @dragover.prevent>
+                    <component :is="templateName"></component>
+                    <myweathercpn></myweathercpn>
+                    <button class="closePre" title="退出预览" @click="quitClick">×</button>
+                    <myrightmenu :rightmenuid="rightMenuId"></myrightmenu>
+
+                    <!-- 快速选择 -->
+                    <div class="quickSelect">
+                        <component @meetingtitleclick="getTitleClick" v-for="(item,index) in quickSelctedTitleData"
+                            :key="index" :is="item"></component>
+                        <div class="listsAndStatus">
+                            <!-- 会议列表内容 -->
+                            <!-- 参会人员 -->
+                            <!-- 办公室使用情况内容 -->
+                            <component @meetinglistclick="getListsClick" @confereeclick="getConfereeClick"
+                                @officeclick="officeClick" v-for="(item,index) in quickSelctedData" :key="index"
+                                :is="item"></component>
+
+                        </div>
+                    </div>
+                    <!-- 矩形、图片、视频中部显示 -->
+                    <component @videolabelclick="getVideoLabelId" @imagelabelclick="getImageLabelId"
+                        @rectangleclick="getRetangleClick" @imageclick="getImageClick" @videoclick="getVideoClick"
+                        v-for="(item,index) in selectedData" :key="index" :is="item">
+                    </component>
+                </div>
+                <!-- 右侧属性栏 -->
+                <div class="right">
+                    <myattrmodulenull></myattrmodulenull>
+                    <myrectangleattr :rightstyle="rectangleAllStyle"></myrectangleattr>
+                    <myimageattr :rightstyle="imageAllStyle"></myimageattr>
+                    <myvideoattr :rightstyle="videoAllStyle"></myvideoattr>
+                    <mymeetingtitleattr :rightstyle="meetingTitleAllStyle"></mymeetingtitleattr>
+                    <mymeetinglistattr :rightstyle="meetingListsAllStyle"></mymeetinglistattr>
+                    <myconfereeattr :rightstyle="confereeAllStyle"></myconfereeattr>
+                    <myofficeattr :rightstyle="officeAllStyle"></myofficeattr>
+                </div>
+            </div>
+            <!-- 主题区域结束 -->
+        </div>
+    </div>
+    <!-- 天气和时间模块 -->
+    <template id="weathercpn">
+        <div class="weathercpn clearfix">
+            <button class="deleteWeather" title="删除" @click="deleteWeather">×</button>
+            <div class="nowTime">
+                <ul>
+                    <li>{{nowDate}}</li>
+                    <li>{{weatherData.week}}</li>
+                </ul>
+            </div>
+            <div class="weather">
+                <ul>
+                    <li>{{weatherData.city}}</li>
+
+                    <li><span class="nowNum">{{weatherData.nowNum}}℃</span>
+                        <span class="weatherStatus">{{weatherData.weatherStatus}}</span>
+                    </li>
+                    <li>{{weatherData.minNum}}℃~{{weatherData.maxNum}}℃</li>
+                </ul>
+            </div>
+
+        </div>
+    </template>
+    <!-- 矩形模块 -->
+    <template id="rectanglecpn">
+        <div class="rectanglecpn" @click="handleClick">
+            <div id="eidtableArea">
+                {{rectangleStyle.rectangleContent}}
+            </div>
+        </div>
+    </template>
+    <!-- 插入图片模块 -->
+    <template id="imagecpn">
+        <div class="imagecpn clearfix" @click='handleClick'>
+            <input type="file" name="myfile" id="id_myfile" @change="imgChange" accept="image/gif, image/jpeg">
+            <label for="id_myfile" class="imageLabel " id="imageLabel" @mousedown="rightClick">
+                <span class="glyphicon glyphicon-picture picture"></span>
+                <span class="text">请选择要上传的图片(gif、jpeg格式)</span>
+            </label>
+        </div>
+    </template>
+    <!-- 插入视频模式 -->
+    <template id="videocpn">
+        <div class="videocpn">
+            <input type="file" id="video_file" accept="video/*" name="file" @change="videoChange" />
+            <label id="videocpn" for="video_file" class="videoLabel" @mousedown="rightClick">
+                <span class="glyphicon glyphicon-film video"></span>
+                <span class="text">请选择要上传的视频</span>
+            </label>
+            <div id="videoBox" @click="handleClick"></div>
+        </div>
+    </template>
+    <!-- 会议主题模块 -->
+    <template id="meetingTitlecpn">
+        <div class="meetingTitlecpn" @click='meetingTitleClick'>
+            {{meetingTitleStyle.meetingTitleContent}}
+        </div>
+    </template>
+    <!-- 参会人员模块 -->
+    <template id="confereecpn">
+        <div class="confereecpn" @click='confereeClick'>
+            <button class="deleteConferee" title="删除" @click="deleteConferee">×</button>
+            <div class="confereecpnTitle">
+
+                <h2>{{confereeContentStyle.confereeContent}}</h2>
+            </div>
+            <div class="confereeContent">
+                <ul>
+                    <li v-for="(item,index) in confereeContent" :key="index">{{item}}</li>
+                </ul>
+            </div>
+        </div>
+    </template>
+    <!-- 会议列表模块 -->
+    <template id="meetingListscpn">
+        <div class="meetingListscpn" @click='meetingListsClick'>
+            <button class="deleteMeetingLists" title="删除" @click="deleteMeetingLists">×</button>
+            <div class="meetingListsTitle">
+                <h2>{{meetingListsStyle.meetingListsTitleContent}}</h2>
+            </div>
+            <div class="meetingListsContent">
+
+                <ul>
+                    <li v-for="(item,index) in meetingListsContent" :key="index">{{item}}</li>
+                </ul>
+            </div>
+        </div>
+    </template>
+    <!-- 办公室使用情况模块 -->
+    <template id="officecpn">
+        <div class="officecpn" @click="officeClick">
+            <div class="officeStatus">
+                <button class="deleteOffice" title="删除" @click="deleteOffice">×</button>
+                <div class="officeTitle">
+                    <h2 style="margin: 0;">{{officeStyle.officeStatus}}</h2>
+                </div>
+                </h2>
+            </div>
+            <div class="nextStatus">
+                <div class="table1">
+                    <table class="table">
+                        <thead class="thead">
+                            <tr>
+                                <th>时间</th>
+                                <th>主题</th>
+                                <th>主讲人</th>
+                                <th>预订人</th>
+                            </tr>
+                        </thead>
+                        <tbody class="tbody1">
+                            <tr class="tr1" v-for="(item,index) in officeMessage" :key="index">
+                                <td>{{item.time}}</td>
+                                <td>{{item.title}}</td>
+                                <td>{{item.compere}}</td>
+                                <td>{{item.reserve}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </template>
+    <!-- 矩形框属性 -->
+    <template id="rectangleAttrcpn">
+        <div class="rectangleAttrcpn">
+            <p class="title">矩形框属性</p>
+            <div class="content">
+                <span>内容:</span>
+                <textarea @input="contentChange" :value="rightstyle.rectangleContent"></textarea>
+            </div>
+            <div class="opacity">
+                <span>层级：</span>
+                <input type="number" :value="rightstyle.zindex" @input="zindexChange"></input>
+            </div>
+            <div class="opacity">
+                <span>透明度:</span>
+                <input max=1 type="number" :value="rightstyle.opacity" @input="opacityChange" step="0.1"></input>
+            </div>
+            <div class="width">
+                <span>宽:</span>
+                <input type="number" :value="rightstyle.width" @input="widthChange"></input>
+            </div>
+            <div class="height">
+                <span>高:</span>
+                <input type="number" :value="rightstyle.height" @input="heightChange"></input>
+            </div>
+            <div class="lineHeight">
+                <span>行高:</span>
+                <input type="number" :value="rightstyle.lineHeight" @input="lineHeightChange"></input>
+            </div>
+            <div class="fontSize">
+                <span>字体大小:</span>
+                <input type="number" :value="rightstyle.fontSize" @input="fontSizeChange"></input>
+            </div>
+            <div class="fontWeight">
+                <span>字体粗细:</span>
+                <input type="number" :value="rightstyle.fontWeight" @input="fontWeightChange"  min="400" max="700" step=100></input>
+            </div>
+            <div class="fontColor">
+                <span>字体颜色：</span>
+                <input type="color" @input="fontColorChange" :value="rightstyle.color">
+            </div>
+            <div class="backGroundColor">
+                <span>背景颜色：</span>
+                <input type="color" @input="backgroundColorChange" :value="rightstyle.backgroundColor">
+            </div>
+            <div class="alignment">
+                <span>左右对齐：</span>
+                <div class="dropup">
+                    <button class="btn  dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                        对齐方式
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a name="left" @click="alignClick">左对齐</a></li>
+                        <li><a name="center" @click="alignClick">居中对齐</a></li>
+                        <li><a name="right" @click="alignClick">右对齐</a></li>
+
+                    </ul>
+                </div>
+            </div>
+            <div class="delete">
+                <button @click="deleteItem">删除</button>
+            </div>
+        </div>
+    </template>
+    <!-- 未点击组件属性 -->
+    <template id="attrModuleNullcpn">
+        <div>
+            <div class="attrModuleNullcpn">
+                <p class="title">属性</p>
+                <div class="selectComponent">请选择组件</div>
+
+            </div>
+        </div>
+    </template>
+    <!-- 图片属性 -->
+    <template id="imageAttrcpn">
+        <div class="imageAttrcpn">
+            <p class="title">图片属性</p>
+            <div class="zindex">
+                <span>层级:</span>
+                <input type="number" :value="rightstyle.zindex" @input="zindexChange"></input>
+            </div>
+            <div class="opacity">
+                <span>透明度:</span>
+                <input max=1 type="number" :value="rightstyle.opacity" @input="opacityChange" step="0.1"></input>
+            </div>
+            <div class="width">
+                <span>宽:</span>
+                <input type="number" :value="rightstyle.width" @input="widthChange"></input>
+            </div>
+            <div class="height">
+                <span>高:</span>
+                <input type="number" :value="rightstyle.height" @input="heightChange"></input>
+            </div>
+            <div class="delete">
+                <button @click="deleteItem">删除</button>
+            </div>
+
+
+        </div>
+    </template>
+    <!-- 视频属性 -->
+    <template id="videoAttrcpn">
+        <div class="videoAttrcpn">
+            <p class="title">视频属性</p>
+            <div class="zindex">
+                <span>层级:</span>
+                <input type="number" :value="rightstyle.zindex" @input="zindexChange"></input>
+            </div>
+            <div class="width">
+                <span>宽:</span>
+                <input type="number" :value="rightstyle.width" @input="widthChange"></input>
+            </div>
+            <div class="height">
+                <span>高:</span>
+                <input type="number" :value="rightstyle.height" @input="heightChange"></input>
+            </div>
+
+            <div class="alignment">
+                <span>播放模式:</span>
+                <div class="dropdown">
+                    <button class="btn  dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                        播放模式
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a name="true" @click="playModeClick">循环播放</a></li>
+                        <li><a name="false" @click="playModeClick">播放一次</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="delete">
+                <button @click="deleteItem">删除</button>
+            </div>
+        </div>
+    </template>
+    <!-- 会议标题属性 -->
+    <template id="meetingTitleAttrcpn">
+
+        <div class="meetingTitleAttrcpn">
+            <p class="title">会议标题属性</p>
+            <div class="content">
+                <span>内容:</span>
+                <textarea @input="contentChange" :value="rightstyle.meetingTitleContent"></textarea>
+            </div>
+            <div class="zindex">
+                <span>层级:</span>
+                <input type="number" :value="rightstyle.zindex" @input="zindexChange"></input>
+            </div>
+            <div class="opacity">
+                <span>透明度:</span>
+                <input max=1 type="number" :value="rightstyle.opacity" @input="opacityChange" step="0.1"></input>
+            </div>
+            <div class="width">
+                <span>宽:</span>
+                <input type="number" :value="rightstyle.width" @input="widthChange"></input>
+            </div>
+            <div class="height">
+                <span>高:</span>
+                <input type="number" :value="rightstyle.height" @input="heightChange"></input>
+            </div>
+            <div class="lineHeight">
+                <span>行高:</span>
+                <input type="number" :value="rightstyle.lineHeight" @input="lineHeightChange"></input>
+            </div>
+            <div class="fontSize">
+                <span>字体大小:</span>
+                <input type="number" :value="rightstyle.fontSize" @input="fontSizeChange"></input>
+            </div>
+            <div class="fontWeight">
+                <span>字体粗细:</span>
+                <input type="number" :value="rightstyle.fontWeight" @input="fontWeightChange"></input>
+            </div>
+            <div class="fontColor">
+                <span>字体颜色：</span>
+                <input type="color" @input="fontColorChange" :value="rightstyle.color">
+            </div>
+            <div class="backGroundColor">
+                <span>背景颜色：</span>
+                <input type="color" @input="backgroundColorChange" :value="rightstyle.backgroundColor">
+            </div>
+            <div class="alignment">
+                <span>左右对齐：</span>
+                <div class="dropup">
+                    <button class="btn  dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                        对齐方式
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a name="left" @click="alignClick">左对齐</a></li>
+                        <li><a name="center" @click="alignClick">居中对齐</a></li>
+                        <li><a name="right" @click="alignClick">右对齐</a></li>
+
+                    </ul>
+                </div>
+
+
+
+            </div>
+            <div class="delete">
+                <button @click="deleteItem">删除</button>
+            </div>
+
+
+
+
+        </div>
+    </template>
+    <!-- 会议列表属性 -->
+    <template id="meetingListAttrcpn">
+        <div class="meetingListAttrcpn">
+            <p class="title">会议列表属性</p>
+            <div class="content">
+                <span>内容:</span>
+                <textarea @input="contentChange" :value="rightstyle.meetingListsTitleContent"></textarea>
+            </div>
+            <div class="zindex">
+                <span>层级：</span>
+                <input type="number" :value="rightstyle.zindex" @input="zindexChange"></input>
+            </div>
+            <div class="opacity">
+                <span>透明度:</span>
+                <input max=1 type="number" :value="rightstyle.opacity" @input="opacityChange" step="0.1"></input>
+            </div>
+            <div class="width">
+                <span>宽:</span>
+                <input type="number" :value="rightstyle.width" @input="widthChange"></input>
+            </div>
+            <div class="height">
+                <span>高:</span>
+                <input type="number" :value="rightstyle.height" @input="heightChange"></input>
+            </div>
+            <div class="lineHeight">
+                <span>行高:</span>
+                <input type="number" :value="rightstyle.lineHeight" @input="lineHeightChange"></input>
+            </div>
+            <div class="fontSize">
+                <span>字体大小:</span>
+                <input type="number" :value="rightstyle.fontSize" @input="fontSizeChange"></input>
+            </div>
+            <div class="fontWeight">
+                <span>字体粗细:</span>
+                <input type="number" :value="rightstyle.fontWeight" @input="fontWeightChange"></input>
+            </div>
+            <div class="fontColor">
+                <span>字体颜色：</span>
+                <input type="color" @input="fontColorChange" :value="rightstyle.color">
+            </div>
+            <div class="backGroundColor">
+                <span>背景颜色：</span>
+                <input type="color" @input="backgroundColorChange" :value="rightstyle.backgroundColor">
+            </div>
+            <div class="alignment">
+                <span>左右对齐：</span>
+                <div class="dropup">
+                    <button class="btn  dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                        对齐方式
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a name="left" @click="alignClick">左对齐</a></li>
+                        <li><a name="center" @click="alignClick">居中对齐</a></li>
+                        <li><a name="right" @click="alignClick">右对齐</a></li>
+
+                    </ul>
+                </div>
+            </div>
+            <div class="delete">
+                <button @click="deleteItem">删除</button>
+            </div>
+
+        </div>
+    </template>
+    <!-- 参会人员属性 -->
+    <template id="confereeAttrcpn">
+        <div class="confereeAttrcpn">
+            <p class="title">参会人员属性</p>
+            <div class="content">
+                <span>内容:</span>
+                <textarea @input="contentChange" :value="rightstyle.confereeContent"></textarea>
+            </div>
+            <div class="zindex">
+                <span>层级：</span>
+                <input type="number" :value="rightstyle.zindex" @input="zindexChange"></input>
+            </div>
+            <div class="opacity">
+                <span>透明度:</span>
+                <input max=1 type="number" :value="rightstyle.opacity" @input="opacityChange" step="0.1"></input>
+            </div>
+            <div class="width">
+                <span>宽:</span>
+                <input type="number" :value="rightstyle.width" @input="widthChange"></input>
+            </div>
+            <div class="height">
+                <span>高:</span>
+                <input type="number" :value="rightstyle.height" @input="heightChange"></input>
+            </div>
+            <div class="lineHeight">
+                <span>行高:</span>
+                <input type="number" :value="rightstyle.lineHeight" @input="lineHeightChange"></input>
+            </div>
+            <div class="fontSize">
+                <span>字体大小:</span>
+                <input type="number" :value="rightstyle.fontSize" @input="fontSizeChange"></input>
+            </div>
+            <div class="fontWeight">
+                <span>字体粗细:</span>
+                <input type="number" :value="rightstyle.fontWeight" @input="fontWeightChange"></input>
+            </div>
+            <div class="fontColor">
+                <span>字体颜色：</span>
+                <input type="color" @input="fontColorChange" :value="rightstyle.color">
+            </div>
+            <div class="backGroundColor">
+                <span>背景颜色：</span>
+                <input type="color" @input="backgroundColorChange" :value="rightstyle.backgroundColor">
+            </div>
+            <div class="alignment">
+                <span>左右对齐：</span>
+                <div class="dropup">
+                    <button class="btn  dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                        对齐方式
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a name="left" @click="alignClick">左对齐</a></li>
+                        <li><a name="center" @click="alignClick">居中对齐</a></li>
+                        <li><a name="right" @click="alignClick">右对齐</a></li>
+
+                    </ul>
+                </div>
+            </div>
+            <div class="delete">
+                <button @click="deleteItem">删除</button>
+            </div>
+
+        </div>
+    </template>
+    <!-- 办公室使用状态属性 -->
+    <template id="officeAttrcpn">
+        <div class="officeAttrcpn">
+            <p class="title">办公室状态属性</p>
+            <div class="content">
+                <span>内容:</span>
+                <textarea @input="contentChange" :value="rightstyle.officeStatus"></textarea>
+            </div>
+            <div class="zindex">
+                <span>层级：</span>
+                <input type="number" :value="rightstyle.zindex" @input="zindexChange"></input>
+            </div>
+            <div class="opacity">
+                <span>透明度:</span>
+                <input max=1 type="number" :value="rightstyle.opacity" @input="opacityChange" step="0.1"></input>
+            </div>
+            <div class="width">
+                <span>宽:</span>
+                <input type="number" :value="rightstyle.width" @input="widthChange"></input>
+            </div>
+            <div class="height">
+                <span>高:</span>
+                <input type="number" :value="rightstyle.height" @input="heightChange"></input>
+            </div>
+            <div class="lineHeight">
+                <span>行高:</span>
+                <input type="number" :value="rightstyle.lineHeight" @input="lineHeightChange"></input>
+            </div>
+            <div class="fontSize">
+                <span>字体大小:</span>
+                <input type="number" :value="rightstyle.fontSize" @input="fontSizeChange"></input>
+            </div>
+            <div class="fontWeight">
+                <span>字体粗细:</span>
+                <input type="number" :value="rightstyle.fontWeight" @input="fontWeightChange"></input>
+            </div>
+            <div class="fontColor">
+                <span>字体颜色：</span>
+                <input type="color" @input="fontColorChange" :value="rightstyle.color">
+            </div>
+            <div class="backGroundColor">
+                <span>背景颜色：</span>
+                <input type="color" @input="backgroundColorChange" :value="rightstyle.backgroundColor">
+            </div>
+            <div class="alignment">
+                <span>左右对齐：</span>
+                <div class="dropup">
+                    <button class="btn  dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                        对齐方式
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a name="left" @click="alignClick">左对齐</a></li>
+                        <li><a name="center" @click="alignClick">居中对齐</a></li>
+                        <li><a name="right" @click="alignClick">右对齐</a></li>
+
+                    </ul>
+                </div>
+            </div>
+            <div class="delete">
+                <button @click="deleteItem">删除</button>
+            </div>
+
+        </div>
+    </template>
+    <!-- 右键菜单组件 -->
+    <template id="rightMenucpn">
+        <div class="rightMenucpn">
+            <ul>
+                <li v-for="(item,index) in rightMenuData" :key="index" @click="deleteClick">{{item}}</li>
+            </ul>
+        </div>
+    </template>
+    <!-- 模板1 -->
+    <template id="template1">
+        <div class="template1">
+            <div class="container">
+                <!-- 左侧区域 -->
+                <div class="temp1left">
+                    <!-- table表单 -->
+                    <div class="table1">
+                        <table class="table">
+                            <thead class="thead">
+                                <tr>
+                                    <th>时间</th>
+                                    <th>主题</th>
+                                    <th>主讲人</th>
+                                    <th>预订人</th>
+                                </tr>
+                            </thead>
+                            <tbody class="tbody1">
+                                <tr class="tr1" v-for="(item,index) in MeetingMessage" :key="index">
+                                    <td>{{item.time}}</td>
+                                    <td>{{item.title}}</td>
+                                    <td>{{item.compere}}</td>
+                                    <td>{{item.reserve}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table2">
+                        <table class="table">
+                            <tbody class="tbody2">
+                                <!-- 公告栏 -->
+                                <tr>
+                                    <td colspan="4" class="announcement">
+                                        <button class="deleteAnnouncement" title="删除"
+                                            @click="deleteAnnouncement">×</button>
+                                        <p>{{announcementData[0]}}</p>
+                                    </td>
+                                </tr>
+                                <!-- 横线 -->
+                                <tr>
+                                    <td colspan="4" class="line">
+                                        <span></span>
+                                    </td>
+                                </tr>
+                                <!-- 天气展示 -->
+                                <tr class="timeAndWeather">
+                                    <td class="week">
+                                        <span class="day">{{date.week}}</span>
+                                        <span class="time">{{date.time}}</span>
+                                    </td>
+                                    <td class="temp1Weather" colspan="3">
+                                        <div class="divWeather">
+                                            <button class="deleteWeather" title="删除" @click="deleteWeather">×</button>
+                                            <div class="city">
+                                                <span>
+                                                    {{weather.city}}
+                                                </span>
+                                            </div>
+                                            <div class="temperature">
+                                                <span>{{weather.temperature}}</span>
+                                            </div>
+                                            <div class="probability">
+                                                <span class="icon iconfont">&#xe790;</span>
+                                                <span class="num">{{weather.probability}}</span>
+                                            </div>
+                                            <div class="windSpeed">
+                                                <span class="icon iconfont">&#xe610;</span>
+                                                <span class="num">{{weather.windSpeed}}</span>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- table表单结束 -->
+                <!-- 右侧区域 -->
+                <div class="temp1Right">
+                    <!-- 会议主题 -->
+                    <div class="meetingTitle">
+                        <button class="deleteMeetingTitle" title="删除" @click="deleteMeetingTitle">×</button>
+                        <p class="title1">{{meetingTitle.title1}}</p>
+                        <p class="title2">{{meetingTitle.title2}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <!-- 模板2 -->
+    <template id="template2">
+        <div class="template2">
+            <div class="container">
+                <div class="temp2Left">
+                </div>
+                <div class="temp2Right">
+                    <div class="temp2Weather">
+                        <ul class="liFather">
+                            <li>{{weather.city}}</li>
+                            <li>{{date.week}}</li>
+                            <li><span>{{date.day}}</span>
+                                <span>{{date.time}}</span>
+                            </li>
+                            <li>{{weather.temperature}}</li>
+                            <li><span class="icon iconfont">&#xe790;</span>
+                                <span>{{weather.probability}}</span>
+                            </li>
+                            <li>
+                                <span class="icon iconfont">&#xe610;</span>
+                                <span>{{weather.windSpeed}}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="temp2Title">
+                        <div class="mettingTitle">
+                            <ul>
+                                <li>
+                                    <span>{{meetingTitle.title1}}</span>
+                                    <span>{{meetingTitle.meetingStatus}}</span>
+                                    <span>{{meetingTitle.meetingRoom}}</span>
+                                </li>
+                                <li>{{meetingTitle.title2}}</li>
+                            </ul>
+                        </div>
+                        <div class="announcement">
+                            <div class="slotLine">
+                                <ul>
+                                    <li class="cicle1"></li>
+                                    <li class="cicle2"></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <ul class="notice">
+                                    <li>公告：</li>
+                                    <li>{{announcement.notice}}</li>
+                                </ul>
+                                <ul class="message">
+                                    <li>通知:</li>
+                                    <li>{{announcement.message}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="temp2Table">
+                        <table class="table">
+                            <thead class="thead">
+                                <tr>
+                                    <th>时间</th>
+                                    <th>主题</th>
+                                    <th>主讲人</th>
+                                    <th>预订人</th>
+                                </tr>
+                            </thead>
+                            <div>
+                                <tbody class="tbody">
+
+                                    <tr class="tr" v-for="(item,index) in MeetingMessage" :key="index">
+                                        <td>{{item.time}}</td>
+                                        <td>{{item.title}}</td>
+                                        <td>{{item.compere}}</td>
+                                        <td>{{item.reserve}}</td>
+                                    </tr>
+
+
+                                </tbody>
+                            </div>
+                        </table>
+                    </div>
+                    <div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <script>
+        // 模块组件
+        // 天气
+        let weather = Vue.extend({
+            template: '#weathercpn',
+            props: ['id'],
+            data() {
+                return {
+                    nowDate: '',
+                    weatherData: {
+                        city: '成都',
+                        nowNum: 28,
+                        maxNum: 32,
+                        minNum: 25,
+                        week: '',
+                        weatherStatus: '阴'
+                    },
+                }
+            },
+            methods: {
+                dateFormat(fmt, date) {
+                    let ret;
+                    const opt = {
+                        "Y+": date.getFullYear().toString(), // 年
+                        "m+": (date.getMonth() + 1).toString(), // 月
+                        "d+": date.getDate().toString(), // 日
+                        "H+": date.getHours().toString(), // 时
+                        "M+": date.getMinutes().toString(), // 分
+                        "S+": date.getSeconds().toString(), // 秒,
+                        "week": date.getDay() + 0
+                        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+                    };
+                    switch (opt.week) {
+                        case 0:
+                            this.weatherData.week = "星期天";
+                            break;
+                        case 1:
+                            this.weatherData.week = "星期一";
+                            break;
+                        case 2:
+                            this.weatherData.week = "星期二";
+                            break;
+                        case 3:
+                            this.weatherData.week = "星期三";
+                            break;
+                        case 4:
+                            this.weatherData.week = "星期四";
+                            break;
+                        case 5:
+                            this.weatherData.week = "星期五";
+                            break;
+                        case 6:
+                            this.weatherData.week = "星期六";
+                            break;
+                    }
+                    for (let k in opt) {
+                        ret = new RegExp("(" + k + ")").exec(fmt);
+                        if (ret) {
+                            fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+                        };
+                    };
+                    return fmt;
+                },
+
+                /*  // 调用天气预报api
+                async getWeather() {
+                    const res = await $.ajax({
+                        type: "GET",
+                        url: "https://v0.yiketianqi.com/api?version=v61&appid=96252139&appsecret=O9SIVpI6",
+
+                        dataType: "json",
+                        success: function(data) {}
+                    });
+
+                    this.weatherData.city = res.city
+                    this.weatherData.nowNum = res.tem
+                    this.weatherData.maxNum = res.tem1
+                    this.weatherData.minNum = res.tem2
+                    this.weatherData.weatherStatus = res.wea
+                },
+ */
+                weatherDrag() {
+                    $(function () {
+                        $('.weather').draggable();
+                        $('.nowTime').draggable()
+
+                    })
+                },
+                deleteWeather(e) {
+                    $(e.target).parents('.weathercpn').hide()
+                }
+            },
+            created() {
+
+                // this.getWeather()
+                setInterval(() => {
+                    this.getWeather();
+                }, 3600000);
+                setInterval(() => {
+                    let date = new Date();
+                    let nowTime = this.dateFormat("YYYY-mm-dd HH:MM:SS", date);
+                    this.nowDate = nowTime;
+                }, 1000);
+                this.weatherDrag();
+            },
+
+        });
+        // 矩形
+        let rectangle = Vue.extend({
+            template: '#rectanglecpn',
+            data() {
+                return {
+                    rectangleStyle: {
+                        rectangleContent: '请输入内容',
+                        opacity:1,
+                        zindex: 0,
+                        currentId: '',
+                        width: '',
+                        height: '',
+                        lineHeight: '',
+                        fontSize: '',
+                        fontWeight: '',
+                        color: '',
+                        backgroundColor: '',
+                        alignment: '',
+                    }
+                }
+            },
+            methods: {
+                rectangleDraggable() {
+                    $(function () {
+                        $(".rectanglecpn").draggable({
+                            onDrag: function (e) {
+                                function scope(height) {
+                                    var d = e.data;
+                                    if (d.left < 0) {
+                                        d.left = 0
+                                    }
+                                    if (d.top < height) {
+                                        d.top = height
+                                    }
+                                    if (d.left + $(d.target).outerWidth() > $(d.parent).outerWidth()) {
+                                        d.left = $(d.parent).width() - $(d.target).outerWidth();
+                                    }
+                                    if (d.top + $(d.target).outerHeight() > $(d.parent).height()) {
+                                        d.top = $(d.parent).height() - $(d.target).outerHeight();
+                                    }
+                                }
+                                let status = $('.weathercpn').css('display')
+                                if (status !== 'none') {
+                                    scope(120)
+
+                                } else {
+                                    scope(0)
+                                }
+                            }
+                        });
+                        $(".rectanglecpn").resizable();
+                    })
+                },
+                handleClick(e) {
+                    let id = e.target.getAttribute('id');
+                    // 获取样式值
+                    let myDiv = e.target.parentNode;
+                    finalStyle = myDiv.currentStyle ? myDiv.currentStyle : document.defaultView.getComputedStyle(myDiv, null);
+                    this.rectangleStyle.rectangleContent = e.target.innerText;
+                    this.rectangleStyle.currentId = id;
+                    this.rectangleStyle.width = finalStyle.width.replace('px', '');
+                    this.rectangleStyle.height = finalStyle.height.replace('px', '');
+                    this.rectangleStyle.lineHeight = parseInt(finalStyle.lineHeight.replace('px', ''));
+                    this.rectangleStyle.fontSize = finalStyle.fontSize.replace('px', '');
+                    this.rectangleStyle.fontWeight = finalStyle.fontWeight;
+                    this.rectangleStyle.alignment = finalStyle.textAlign;
+                    this.rectangleStyle.zindex = finalStyle.zIndex;
+                    this.rectangleStyle.opacity=finalStyle.opacity
+                    // rgba转换为16进制
+                    function hexify(color) {
+                        var values = color
+                            .replace(/rgba?\(/, '')
+                            .replace(/\)/, '')
+                            .replace(/[\s+]/g, '')
+                            .split(',');
+                        var a = parseFloat(values[3] || 1),
+                            r = Math.floor(a * parseInt(values[0]) + (1 - a) * 255),
+                            g = Math.floor(a * parseInt(values[1]) + (1 - a) * 255),
+                            b = Math.floor(a * parseInt(values[2]) + (1 - a) * 255);
+                        return "#" +
+                            ("0" + r.toString(16)).slice(-2) +
+                            ("0" + g.toString(16)).slice(-2) +
+                            ("0" + b.toString(16)).slice(-2);
+                    }
+                    const color = hexify(finalStyle.color);
+                    const backgroundColor = hexify(finalStyle.backgroundColor);
+                    this.rectangleStyle.color = color;
+                    this.rectangleStyle.backgroundColor = backgroundColor;
+                    $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+
+                    $('.rectangleAttrcpn').show();
+                    // vue子传父，定义自定义事件，这里发射，然后去父组件接收
+                    rectangleStyle = this.rectangleStyle;
+                    this.$emit('rectangleclick', rectangleStyle)
+                },
+
+            },
+            created() {
+                this.rectangleDraggable();
+            },
+
+            mounted() {
+                let index = $('.rectanglecpn').length - 1;
+                let allRectanglecpn = $('.rectanglecpn')
+                let children = allRectanglecpn[index].children
+                id = 'eidtableArea' + index
+                // 给当前矩形设置ID
+                children[0].setAttribute('id', id)
+
+            },
+
+        });
+        // 图片
+        let image = Vue.extend({
+            template: '#imagecpn',
+            data() {
+                return {
+                    imageStyle: {
+                        currentId: '',
+                        opacity:0,
+                        zindex: 0,
+                        width: '',
+                        height: ''
+                    },
+                }
+            },
+            methods: {
+                imgChange(e) {
+                    // 先获取用户上传的文件对象
+                    let fileObj = $('#id_myfile')[0].files[0];
+                    // 生成一个文件读取的内置对象
+                    let fileReader = new FileReader();
+                    // 将文件对象传递给内置对象
+                    fileReader.readAsDataURL(fileObj); //这是一个异步执行的过程，所以需要onload回调函数执行读取数据后的操作
+                    fileReader.onload = function () { // 等待文件阅读器读取完毕再渲染图片
+                        var insertImg = document.createElement('img');
+                        var imgLabel = document.getElementsByClassName('imageLabel');
+                        var imgcpn=document.getElementsByClassName('id_img')
+                        var imgFather = document.getElementsByClassName('imagecpn');
+                        // 利用length来防止后面添加的图片都放在一个div里面，导致顺序错误
+                        let length = imgLabel.length - 1;
+                        imgFather[length].appendChild(insertImg);
+                        insertImg.setAttribute('src', fileReader.result);
+                        id = "img" + imgcpn.length
+                        insertImg.setAttribute('id', id);
+                        insertImg.setAttribute('class', 'id_img');
+                        $('.id_img').draggable({
+                            onDrag: function (e) {
+                                function scope(height) {
+                                    var d = e.data;
+                                    if (d.left < 0) {
+                                        d.left = 0
+                                    }
+                                    if (d.top < height) {
+                                        d.top = height
+                                    }
+                                    if (d.left + $(d.target).outerWidth() > $(d.parent).parent().outerWidth()) {
+                                        d.left = $(d.parent).parent().width() - $(d.target).outerWidth();
+                                    }
+                                    if (d.top + $(d.target).outerHeight() >= $(d.parent).parent().height()) {
+                                        d.top = $(d.parent).parent().height() - $(d.target).outerHeight();
+                                    }
+                                }
+                                let status = $('.weathercpn').css('display')
+                                if (status !== 'none') {
+                                    scope(120)
+                                } else {
+                                    scope(0)
+
+                                }
+                            }
+                        });
+                        $('.id_img').resizable()
+                        $(e.target).siblings('.imageLabel').remove();
+                        $('#id_myfile').remove();
+                    }
+
+                },
+                imageDraggable() {
+                    $(function () {
+                        $('.imageLabel').draggable({
+
+
+                            onDrag: function (e) {
+                                function scope(height) {
+                                    var d = e.data;
+                                    if (d.left < 0) {
+                                        d.left = 0
+                                    }
+                                    if (d.top < height) {
+                                        d.top = height
+                                    }
+                                    if (d.left + $(d.target).outerWidth() > $(d.parent).parent().outerWidth()) {
+                                        d.left = $(d.parent).parent().width() - $(d.target).outerWidth();
+                                    }
+                                    if (d.top + $(d.target).outerHeight() > $(d.parent).parent().height()) {
+                                        d.top = $(d.parent).parent().height() - $(d.target).outerHeight();
+                                    }
+                                }
+                                let status = $('.weathercpn').css('display')
+                                if (status !== 'none') {
+                                    scope(120)
+
+                                } else {
+                                    scope(0)
+
+                                }
+                            }
+
+                        })
+                    })
+                },
+                handleClick(e) {
+                    if ($('#id_myfile').length !== 1) {
+                        let id = e.target.getAttribute('id');
+                        let myDiv = e.target;
+                        finalStyle = myDiv.currentStyle ? myDiv.currentStyle : document.defaultView.getComputedStyle(myDiv, null);
+                        this.imageStyle.currentId = id;
+                        this.imageStyle.zindex = finalStyle.zIndex
+                        this.imageStyle.width = parseInt(finalStyle.width.replace('px', ''));
+                        this.imageStyle.height = parseInt(finalStyle.height.replace('px', ''));
+                        this.imageStyle.opacity=finalStyle.opacity;
+                        $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                        $('.imageAttrcpn').show();
+                        imageStyle = this.imageStyle
+                        this.$emit('imageclick', imageStyle)
+
+                    }
+                },
+
+                // 点击右键触发
+                rightClick(e) {
+                    e.preventDefault();
+                    e.stopPropagation()
+                    //去掉默认的contextmenu事件，否则会和右键事件同时出现。
+                    document.oncontextmenu = function (e) {
+                        e.preventDefault();
+                    };
+                    if (e.button == 0) {
+                        $('.rightMenucpn').css({
+                            'display': 'none'
+                        })
+
+                    }
+                    if (e.button == 2) {
+                        let id = '';
+                        if (e.target.getAttribute('id') == null) {
+                            id = $(e.target).parent().attr('id')
+                        } else {
+                            id = e.target.getAttribute('id')
+                        }
+                        let myDiv = $('.left')[0];
+                        finalStyle = myDiv.currentStyle ? myDiv.currentStyle : document.defaultView.getComputedStyle(myDiv, null);
+                        let leftWidth = finalStyle.width.replace('px', '');
+                        // 点击时距离左边的距离
+                        rightMenuX = e.pageX - leftWidth;
+                        rightMenuY = e.pageY - 58 + 10;
+                        $('.rightMenucpn').css({
+                            'left': rightMenuX,
+                            'top': rightMenuY,
+                            'display': 'block'
+                        })
+                        this.$emit('imagelabelclick', id)
+
+                    }
+
+                }
+            },
+            created() {
+                this.imageDraggable();
+
+            },
+        });
+        // 视频
+        let video = Vue.extend({
+            template: '#videocpn',
+            data() {
+                return {
+                    videoStyle: {
+                        currentId: '',
+                        zindex: 1,
+                        loop: '',
+                        width: '',
+                        height: '',
+                    }
+                }
+            },
+            methods: {
+                videoChange() {
+                    // 先获取用户上传的文件对象
+                    let file = $('#video_file')[0].files[0];
+                    if (window.FileReader) {
+                        var fr = new FileReader();
+                        fr.onloadend = function (e) {
+                            var video = document.createElement("video");
+                            video.controls = "controls";
+                            video.id = "video";
+                            video.loop = '';
+                            video.src = e.target.result;
+                            video.width = 700;
+                            video.height = 500;
+                            document.getElementById("videoBox").appendChild(video);
+                        };
+                        fr.readAsDataURL(file);
+                    }
+                    document.getElementById("video_file").value = "";
+                    $('#video_file').remove();
+                    $('.videoLabel').remove();
+                    $('#video').resizable()
+
+                },
+                videoDraggable() {
+                    $(function () {
+                        // videoLabel
+
+                        $('.videoLabel').draggable({
+                            onDrag: function (e) {
+                                function scope(height) {
+                                    var d = e.data;
+                                    if (d.left < 0) {
+                                        d.left = 0
+                                    }
+                                    if (d.top < height) {
+                                        d.top = height
+                                    }
+                                    if (d.left + $(d.target).outerWidth() > $(d.parent).parent().outerWidth()) {
+                                        d.left = $(d.parent).parent().width() - $(d.target).outerWidth();
+                                    }
+                                    if (d.top + $(d.target).outerHeight() > $(d.parent).parent().height()) {
+                                        d.top = $(d.parent).parent().height() - $(d.target).outerHeight();
+                                    }
+                                }
+
+                                let status = $('.weathercpn').css('display')
+                                if (status !== 'none') {
+                                    scope(120)
+                                } else {
+                                    scope(0)
+
+                                }
+
+
+                            }
+                        })
+                        $('#videoBox').draggable({
+                            onDrag: function (e) {
+                                function scope(height) {
+                                    let myDiv = e.target;
+                                    finalStyle = myDiv.currentStyle ? myDiv.currentStyle : document.defaultView.getComputedStyle(myDiv, null);
+                                    let videoBoxHeight = finalStyle.height;
+                                    let videoBoxWidth = finalStyle.width;
+                                    // 实际和初始的差值
+                                    let differenceHight = videoBoxHeight.replace('px', '') - 500
+                                    let differenceWidth = videoBoxWidth.replace('px', '') - 700
+                                    let y = height - 0.5 * differenceHight + 0.25 * differenceWidth
+                                    var d = e.data;
+                                    if (d.left < 0) {
+                                        d.left = 0
+                                    }
+                                    if (d.top < y) {
+                                        d.top = y
+                                    }
+                                    if (d.left + $(d.target).outerWidth() > $(d.parent).parent().outerWidth()) {
+                                        d.left = $(d.parent).parent().width() - $(d.target).outerWidth();
+                                    }
+                                    if (d.top + $(d.target).outerHeight() >= $(d.parent).parent().height()) {
+                                        d.top = $(d.parent).parent().height() - $(d.target).outerHeight();
+                                    }
+                                }
+
+                                let status = $('.weathercpn').css('display')
+                                if (status !== 'none') {
+                                    scope(68)
+
+                                } else {
+                                    scope(-53)
+
+                                }
+                            }
+
+                        });
+
+                    })
+                },
+                handleClick(e) {
+                    let id = e.target.getAttribute('id');
+                    let myDiv = e.target;
+                    finalStyle = myDiv.currentStyle ? myDiv.currentStyle : document.defaultView.getComputedStyle(myDiv, null);
+                    this.videoStyle.width = finalStyle.width.replace('px', '');
+                    this.videoStyle.height = finalStyle.height.replace('px', '');
+                    this.videoStyle.zindex = finalStyle.zIndex;
+                    this.videoStyle.currentId = id;
+                    this.videoStyle.loop = e.target.loop;
+                    $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                    $('.videoAttrcpn').show();
+                    videoStyle = this.videoStyle
+                    this.$emit('videoclick', videoStyle)
+                },
+                // 右键菜单
+                // 点击右键触发
+                rightClick(e) {
+                    e.preventDefault();
+                    e.stopPropagation()
+                    //去掉默认的contextmenu事件，否则会和右键事件同时出现。
+                    document.oncontextmenu = function (e) {
+                        e.preventDefault();
+                    };
+                    if (e.button == 0) {
+                        $('.rightMenucpn').css({
+
+                            'display': 'none'
+                        })
+
+                    }
+                    if (e.button == 2) {
+                        let id = '';
+                        if (e.target.getAttribute('id') == null) {
+                            id = $(e.target).parent().attr('id')
+                        } else {
+                            id = e.target.getAttribute('id')
+                        }
+                        let myDiv = $('.left')[0];
+                        finalStyle = myDiv.currentStyle ? myDiv.currentStyle : document.defaultView.getComputedStyle(myDiv, null);
+                        let leftWidth = finalStyle.width.replace('px', '');
+                        // 点击时距离左边的距离
+                        rightMenuX = e.pageX - leftWidth;
+                        rightMenuY = e.pageY - 58 + 10;
+                        $('.rightMenucpn').css({
+                            'left': rightMenuX,
+                            'top': rightMenuY,
+                            'display': 'block'
+                        })
+                        this.$emit('videolabelclick', id)
+
+                    }
+
+                }
+            },
+            created() {
+                this.videoDraggable()
+            }
+        });
+        // 会议主题
+        let meetingTitle = Vue.extend({
+            template: '#meetingTitlecpn',
+            data() {
+                return {
+                    // 会议主题
+                    meetingTitleStyle: {
+                        meetingTitleContent: '中国共产党成立一百周年',
+                        currentId: '',
+                        opacity:1,
+                        zindex: 0,
+                        width: '',
+                        height: '',
+                        lineHeight: '',
+                        fontSize: '',
+                        fontWeight: '',
+                        color: '',
+                        backgroundColor: '',
+                        alignment: '',
+                    }
+                }
+            },
+            methods: {
+                meetingTitleDrag() {
+                    $(function () {
+                        $('.meetingTitlecpn').draggable({
+                            onDrag: function (e) {
+                                function scope(height) {
+                                    var d = e.data;
+                                    if (d.left < 0) {
+                                        d.left = 0
+                                    }
+                                    if (d.top < height) {
+                                        d.top = height
+                                    }
+                                    if (d.left + $(d.target).outerWidth() > $(d.parent).parent().outerWidth()) {
+                                        d.left = $(d.parent).parent().width() - $(d.target).outerWidth();
+                                    }
+                                    if (d.top + $(d.target).outerHeight() > $(d.parent).parent().height()) {
+                                        d.top = $(d.parent).parent().height() - $(d.target).outerHeight();
+                                    }
+                                }
+                                let status = $('.weathercpn').css('display')
+                                if (status !== 'none') {
+                                    scope(120)
+                                } else {
+                                    scope(0)
+
+                                }
+
+
+                            }
+                        });
+                        $(".meetingTitlecpn").resizable({
+                            minWidth: 150,
+                            minHeight: 70,
+                        });
+                    })
+                },
+                meetingTitleClick(e) {
+                    let id = e.target.getAttribute('id');
+                    // 获取样式值
+                    let myDiv = e.target
+                    finalStyle = myDiv.currentStyle ? myDiv.currentStyle : document.defaultView.getComputedStyle(myDiv, null);
+                    this.meetingTitleStyle.meetingTitleContent = e.target.innerText;
+                    this.meetingTitleStyle.currentId = id;
+                    this.meetingTitleStyle.width = parseInt(finalStyle.width.replace('px', ''));
+                    this.meetingTitleStyle.height = finalStyle.height.replace('px', '');
+                    this.meetingTitleStyle.lineHeight = parseInt(finalStyle.lineHeight.replace('px', ''));
+                    this.meetingTitleStyle.fontSize = finalStyle.fontSize.replace('px', '');
+                    this.meetingTitleStyle.fontWeight = finalStyle.fontWeight;
+                    this.meetingTitleStyle.alignment = finalStyle.textAlign;
+                    this.meetingTitleStyle.zindex = finalStyle.zIndex;
+                    this.meetingTitleStyle.opacity=finalStyle.opacity
+
+                    // rgba转换为16进制
+                    function hexify(color) {
+                        var values = color
+                            .replace(/rgba?\(/, '')
+                            .replace(/\)/, '')
+                            .replace(/[\s+]/g, '')
+                            .split(',');
+                        var a = parseFloat(values[3] || 1),
+                            r = Math.floor(a * parseInt(values[0]) + (1 - a) * 255),
+                            g = Math.floor(a * parseInt(values[1]) + (1 - a) * 255),
+                            b = Math.floor(a * parseInt(values[2]) + (1 - a) * 255);
+                        return "#" +
+                            ("0" + r.toString(16)).slice(-2) +
+                            ("0" + g.toString(16)).slice(-2) +
+                            ("0" + b.toString(16)).slice(-2);
+                    }
+                    const color = hexify(finalStyle.color);
+                    const backgroundColor = hexify(finalStyle.backgroundColor);
+                    this.meetingTitleStyle.color = color;
+                    this.meetingTitleStyle.backgroundColor = backgroundColor;
+                    $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                    $('.meetingTitleAttrcpn').show();
+                    // vue子传父，定义自定义事件，这里发射，然后去父组件接收
+                    meetingTitleStyle = this.meetingTitleStyle;
+                    this.$emit('meetingtitleclick', meetingTitleStyle)
+                }
+
+
+            },
+            created() {
+                this.meetingTitleDrag()
+            },
+            mounted() {
+                //给每一个会议标题设置独一无二的id
+                let index = $('.meetingTitlecpn').length - 1;
+
+                let allMeetingTitlecpn = $('.meetingTitlecpn')
+                id = 'meetingTitle' + index
+                // 给当前矩形设置ID
+                allMeetingTitlecpn[index].setAttribute('id', id)
+            }
+
+        });
+        // 会议列表
+        let meetingLists = Vue.extend({
+            template: '#meetingListscpn',
+            data() {
+                return {
+                    // 会议列表内容
+                    meetingListsContent: ['中共十七届一中全会北京2007年10月22日',
+                        '中共十七届二中全会北京2008年2月25日至27日',
+                        '中共十七届三中全会北京2008年10月9日至12日',
+                        '中共十七届四中全会北京2009年9月15日至18日',
+                        '中共十七届五中全会北京2010年10月15日至18日',
+                        '中共十七届六中全会北京2011年10月15日至18日',
+                        '中共十七届二中全会北京2008年2月25日至27日',
+                        '中共十七届三中全会北京2008年10月9日至12日',
+                        '中共十七届四中全会北京2009年9月15日至18日',
+                        '中共十七届五中全会北京2010年10月15日至18日',
+                        '中共十七届六中全会北京2011年10月15日至18日'
+                    ],
+                    meetingListsStyle: {
+                        meetingListsTitleContent: '会议列表',
+                        currentId: '',
+                        zindex: 0,
+                        opacity:1,
+                        width: '',
+                        height: '',
+                        lineHeight: '',
+                        fontSize: '',
+                        fontWeight: '',
+                        color: '',
+                        backgroundColor: '',
+                        alignment: '',
+                    }
+                }
+
+            },
+            methods: {
+                meetingListDrag() {
+                    $(function () {
+                        $('.meetingListscpn').draggable({
+                            onDrag: function (e) {
+                                function scope(height) {
+                                    var d = e.data;
+                                    if (d.left < 0) {
+                                        d.left = 0
+                                    }
+                                    if (d.top < height) {
+                                        d.top = height
+                                    }
+                                    if (d.left + $(d.target).outerWidth() > $(d.parent).parent().outerWidth()) {
+                                        d.left = $(d.parent).parent().parent().width() - $(d.target).outerWidth();
+                                    }
+                                    if (d.top + $(d.target).outerHeight() > $(d.parent).parent().parent().height()) {
+                                        d.top = $(d.parent).parent().parent().height() - $(d.target).outerHeight();
+                                    }
+                                }
+                                let status = $('.weathercpn').css('display')
+                                if (status !== 'none') {
+                                    scope(120)
+                                } else {
+                                    scope(0)
+                                }
+
+                            }
+                        });
+                        $(".meetingListscpn").resizable();
+                    })
+                },
+                deleteMeetingLists(e) {
+                    e.path[1].remove()
+                    $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                    $('.attrModuleNullcpn').show()
+                },
+                meetingListsClick(e) {
+                    let id = e.target.getAttribute('id');
+
+                    // 获取样式值
+                    if (id == null) {
+                        id = $(e.target).parents('.meetingListscpn')[0].getAttribute('id');
+                    }
+                    let myDiv = $('#' + id)[0];
+                    let myDiv1 = $('#' + id).children('.meetingListsTitle').children()[0];
+                    let myDiv2 = $('#' + id).children('.meetingListsTitle')[0]
+                    finalStyle = myDiv.currentStyle ? myDiv.currentStyle : document.defaultView.getComputedStyle(myDiv, null);
+                    finalStyle1 = myDiv1.currentStyle ? myDiv1.currentStyle : document.defaultView.getComputedStyle(myDiv1, null);
+                    finalStyle2 = myDiv2.currentStyle ? myDiv2.currentStyle : document.defaultView.getComputedStyle(myDiv2, null);
+                    this.meetingListsStyle.meetingListsTitleContent = $('#' + id).children('.meetingListsTitle').children()[0].outerText;
+                    this.meetingListsStyle.currentId = id;
+                    this.meetingListsStyle.width = parseInt(finalStyle.width.replace('px', ''));
+                    this.meetingListsStyle.height = finalStyle.height.replace('px', '');
+                    this.meetingListsStyle.lineHeight = parseInt(finalStyle1.lineHeight.replace('px', ''));
+                    this.meetingListsStyle.fontSize = finalStyle1.fontSize.replace('px', '');
+                    this.meetingListsStyle.fontWeight = finalStyle1.fontWeight;
+                    this.meetingListsStyle.alignment = finalStyle1.textAlign;
+                    this.meetingListsStyle.zindex = finalStyle.zIndex;
+                    this.meetingListsStyle.opacity = finalStyle.opacity;
+
+
+                    // rgba转换为16进制
+                    function hexify(color) {
+                        var values = color
+                            .replace(/rgba?\(/, '')
+                            .replace(/\)/, '')
+                            .replace(/[\s+]/g, '')
+                            .split(',');
+                        var a = parseFloat(values[3] || 1),
+                            r = Math.floor(a * parseInt(values[0]) + (1 - a) * 255),
+                            g = Math.floor(a * parseInt(values[1]) + (1 - a) * 255),
+                            b = Math.floor(a * parseInt(values[2]) + (1 - a) * 255);
+                        return "#" +
+                            ("0" + r.toString(16)).slice(-2) +
+                            ("0" + g.toString(16)).slice(-2) +
+                            ("0" + b.toString(16)).slice(-2);
+                    }
+                    const color = hexify(finalStyle1.color);
+                    const backgroundColor = hexify(finalStyle2.backgroundColor);
+                    this.meetingListsStyle.color = color;
+                    this.meetingListsStyle.backgroundColor = backgroundColor;
+                    $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                    $('.meetingListAttrcpn').show();
+
+                    // vue子传父，定义自定义事件，这里发射，然后去父组件接收
+                    meetingListsStyle = this.meetingListsStyle;
+                    this.$emit('meetinglistclick', meetingListsStyle)
+                }
+            },
+            created() {
+                this.meetingListDrag()
+            },
+            mounted() {
+                //给每一个会议列表设置独一无二的id
+                let index = $('.meetingListscpn').length - 1;
+
+                let allMeetingListscpn = $('.meetingListscpn')
+                id = 'meetingLists' + index
+                // 给当前矩形设置ID
+                allMeetingListscpn[index].setAttribute('id', id)
+            }
+
+        });
+        // 办公室会议
+        let office = Vue.extend({
+            template: '#officecpn',
+            data() {
+                return {
+                    // 办公室后续预约数据
+                    officeMessage: [{
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }],
+                    officeStyle: {
+                        officeStatus: '正在使用',
+                        opacity:1,
+                        currentId: '',
+                        zindex: 0,
+                        width: '',
+                        height: '',
+                        lineHeight: '',
+                        fontSize: '',
+                        fontWeight: '',
+                        color: '',
+                        backgroundColor: '',
+                        alignment: '',
+                    }
+
+                }
+            },
+            methods: {
+                officecpnDrag() {
+                    $(function () {
+                        $('.officecpn').draggable({
+                            onDrag: function (e) {
+                                function scope(height) {
+                                    var d = e.data;
+                                    if (d.left < 0) {
+                                        d.left = 0
+                                    }
+                                    if (d.top < height) {
+                                        d.top = height
+                                    }
+                                    if (d.left + $(d.target).outerWidth() > $(d.parent).parent().outerWidth()) {
+                                        d.left = $(d.parent).parent().parent().width() - $(d.target).outerWidth();
+                                    }
+                                    if (d.top + $(d.target).outerHeight() > $(d.parent).parent().parent().height()) {
+                                        d.top = $(d.parent).parent().parent().height() - $(d.target).outerHeight();
+                                    }
+                                }
+
+                                let status = $('.weathercpn').css('display')
+                                if (status !== 'none') {
+                                    scope(120)
+
+                                } else {
+                                    scope(0)
+                                }
+
+                            }
+                        });
+                        $(".officecpn").resizable();
+                    })
+                },
+                deleteOffice(e) {
+                    $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                    $('.attrModuleNullcpn').show()
+                    e.path[2].remove()
+                },
+                officeClick(e) {
+                    let id = e.target.getAttribute('id');
+                    // 获取样式值
+                    if (id == null) {
+                        id = $(e.target).parents('.officecpn')[0].getAttribute('id');
+                    }
+                    let myDiv = $('#' + id)[0];
+                    let myDiv1 = $('#' + id).children('.officeStatus').children('.officeTitle').children()[0];
+                    let myDiv2 = $('#' + id).children('.officeStatus')[0]
+                    finalStyle = myDiv.currentStyle ? myDiv.currentStyle : document.defaultView.getComputedStyle(myDiv, null);
+                    finalStyle1 = myDiv1.currentStyle ? myDiv1.currentStyle : document.defaultView.getComputedStyle(myDiv1, null);
+                    finalStyle2 = myDiv2.currentStyle ? myDiv2.currentStyle : document.defaultView.getComputedStyle(myDiv2, null);
+                    this.officeStyle.officeStatus = $('#' + id).children('.officeStatus').children('.officeTitle').children()[0].outerText;
+                    this.officeStyle.currentId = id;
+                    this.officeStyle.width = parseInt(finalStyle.width.replace('px', ''));
+                    this.officeStyle.height = parseInt(finalStyle.height.replace('px', ''));
+                    this.officeStyle.lineHeight = parseInt(finalStyle1.lineHeight.replace('px', ''));
+                    this.officeStyle.fontSize = finalStyle1.fontSize.replace('px', '');
+                    this.officeStyle.fontWeight = finalStyle1.fontWeight;
+                    this.officeStyle.alignment = finalStyle1.textAlign;
+                    this.officeStyle.zindex = finalStyle.zIndex;
+                    this.officeStyle.opacity = finalStyle.opacity;
+                    // rgba转换为16进制
+                    function hexify(color) {
+                        var values = color
+                            .replace(/rgba?\(/, '')
+                            .replace(/\)/, '')
+                            .replace(/[\s+]/g, '')
+                            .split(',');
+                        var a = parseFloat(values[3] || 1),
+                            r = Math.floor(a * parseInt(values[0]) + (1 - a) * 255),
+                            g = Math.floor(a * parseInt(values[1]) + (1 - a) * 255),
+                            b = Math.floor(a * parseInt(values[2]) + (1 - a) * 255);
+                        return "#" +
+                            ("0" + r.toString(16)).slice(-2) +
+                            ("0" + g.toString(16)).slice(-2) +
+                            ("0" + b.toString(16)).slice(-2);
+                    }
+                    const color = hexify(finalStyle1.color);
+                    const backgroundColor = hexify(finalStyle2.backgroundColor);
+                    this.officeStyle.color = color;
+                    this.officeStyle.backgroundColor = backgroundColor;
+                    $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                    $('.officeAttrcpn').show()
+
+                    // vue子传父，定义自定义事件，这里发射，然后去父组件接收
+                    officeStyle = this.officeStyle;
+                    this.$emit('officeclick', officeStyle)
+                }
+            },
+            created() {
+                this.officecpnDrag()
+            },
+            mounted() {
+                //给每一个办公室使用情况设置独一无二的id
+                let index = $('.officecpn').length - 1;
+
+                let allOfficecpn = $('.officecpn')
+                id = 'officecpn' + index;
+                // 给当前矩形设置ID
+                allOfficecpn[index].setAttribute('id', id);
+            }
+
+
+        });
+        // 参会人员
+        let confereeContent = Vue.extend({
+            template: '#confereecpn',
+            data() {
+                return {
+                    confereeContent: ["张三", "李四", "刘五", "张三",
+                        "李四", "刘五", "张三", "李四", "刘五", "张三", "李四", "刘五",
+                        "张三", "李四", "刘五", "张三", "李四", "刘五", "张三", "李四", "刘五", "张三", "李四", "刘五", "张三", "李四", "刘五", "张三", "李四", "刘五", "张三", "李四", "刘五", "张三", "李四", "刘五", "张三", "李四", "刘五", "张三",
+                        "李四", "刘五", "张三", "李四", "刘五",
+                        "张三", "李四", "刘五", "张三", "李四", "刘五", "张三", "李四", "刘五", "张三",
+                        "李四", "刘五",
+                        "张三", "李四", "刘五", "张三", "李四", "刘五", "张三", "李四", "刘五",
+                        "张三", "李四", "刘五"
+                    ],
+                    confereeContentStyle: {
+                        confereeContent: '参会人员',
+                        opacity:1,
+                        currentId: '',
+                        zindex: 0,
+                        width: '',
+                        height: '',
+                        lineHeight: '',
+                        fontSize: '',
+                        fontWeight: '',
+                        color: '',
+                        backgroundColor: '',
+                        alignment: '',
+                    }
+
+                }
+            },
+            methods: {
+                confereecpnDrag() {
+                    $(function () {
+                        $('.confereecpn').draggable({
+                            onDrag: function (e) {
+                                function scope(height) {
+                                    var d = e.data;
+                                    if (d.left < 0) {
+                                        d.left = 0
+                                    }
+                                    if (d.top < height) {
+                                        d.top = height
+                                    }
+                                    if (d.left + $(d.target).outerWidth() > $(d.parent).parent().outerWidth()) {
+                                        d.left = $(d.parent).parent().parent().width() - $(d.target).outerWidth();
+                                    }
+                                    if (d.top + $(d.target).outerHeight() > $(d.parent).parent().parent().height()) {
+                                        d.top = $(d.parent).parent().parent().height() - $(d.target).outerHeight();
+                                    }
+                                }
+                                let status = $('.weathercpn').css('display')
+                                if (status !== 'none') {
+                                    scope(120)
+
+                                } else {
+                                    scope(0)
+
+                                }
+
+                            }
+                        });
+                        $(".confereecpn").resizable();
+                    })
+                },
+                // 删除
+                deleteConferee(e) {
+                    e.path[1].remove()
+                    $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                    $('.attrModuleNullcpn').show()
+                },
+                confereeClick(e) {
+                    let id = e.target.getAttribute('id');
+                    // 获取样式值
+                    if (id == null) {
+                        id = $(e.target).parents('.confereecpn')[0].getAttribute('id');
+                    }
+                    let myDiv = $('#' + id)[0];
+                    let myDiv1 = $('#' + id).children('.confereecpnTitle').children()[0];
+                    let myDiv2 = $('#' + id).children('.confereecpnTitle')[0]
+                    finalStyle = myDiv.currentStyle ? myDiv.currentStyle : document.defaultView.getComputedStyle(myDiv, null);
+                    finalStyle1 = myDiv1.currentStyle ? myDiv1.currentStyle : document.defaultView.getComputedStyle(myDiv1, null);
+                    finalStyle2 = myDiv2.currentStyle ? myDiv2.currentStyle : document.defaultView.getComputedStyle(myDiv2, null);
+                    this.confereeContentStyle.meetingListsTitleContent = $('#' + id).children('.confereecpnTitle').children()[0].outerText;
+                    this.confereeContentStyle.currentId = id;
+                    this.confereeContentStyle.width = parseInt(finalStyle.width.replace('px', ''));
+                    this.confereeContentStyle.height = parseInt(finalStyle.height.replace('px', ''));
+                    this.confereeContentStyle.lineHeight = parseInt(finalStyle1.lineHeight.replace('px', ''));
+                    this.confereeContentStyle.fontSize = finalStyle1.fontSize.replace('px', '');
+                    this.confereeContentStyle.fontWeight = finalStyle1.fontWeight;
+                    this.confereeContentStyle.alignment = finalStyle1.textAlign;
+                    this.confereeContentStyle.zindex = finalStyle.zIndex;
+                    this.confereeContentStyle.opacity=finalStyle.opacity;
+
+                    // rgba转换为16进制
+                    function hexify(color) {
+                        var values = color
+                            .replace(/rgba?\(/, '')
+                            .replace(/\)/, '')
+                            .replace(/[\s+]/g, '')
+                            .split(',');
+                        var a = parseFloat(values[3] || 1),
+                            r = Math.floor(a * parseInt(values[0]) + (1 - a) * 255),
+                            g = Math.floor(a * parseInt(values[1]) + (1 - a) * 255),
+                            b = Math.floor(a * parseInt(values[2]) + (1 - a) * 255);
+                        return "#" +
+                            ("0" + r.toString(16)).slice(-2) +
+                            ("0" + g.toString(16)).slice(-2) +
+                            ("0" + b.toString(16)).slice(-2);
+                    }
+                    const color = hexify(finalStyle1.color);
+                    const backgroundColor = hexify(finalStyle2.backgroundColor);
+                    this.confereeContentStyle.color = color;
+                    this.confereeContentStyle.backgroundColor = backgroundColor;
+                    $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                    $('.confereeAttrcpn').show()
+
+                    // vue子传父，定义自定义事件，这里发射，然后去父组件接收
+                    confereeContentStyle = this.confereeContentStyle;
+                    this.$emit('confereeclick', confereeContentStyle)
+                }
+
+            },
+            created() {
+                this.confereecpnDrag()
+            },
+            mounted() {
+                //给每一个会议列表设置独一无二的id
+                let index = $('.confereecpn').length - 1;
+
+                let confereecpn = $('.confereecpn')
+                id = 'confereecpn' + index
+                // 给当前矩形设置ID
+                confereecpn[index].setAttribute('id', id)
+            }
+
+        });
+        // 右边属性
+        // 矩形框属性
+        // 矩形属性
+        let rectangleAttr = Vue.extend({
+            template: '#rectangleAttrcpn',
+            props: ['rightstyle'],
+            methods: {
+                // 内容变换
+                contentChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    if (e !== undefined) {
+                        let content = e.target.value
+                        // 赋值给当前矩形框
+                        $(id).text(content)
+                    }
+                },
+                // 层级修改
+                zindexChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let zindex = e.target.value;
+                    $(id).parent().css('z-index', zindex);
+                },
+                opacityChange(e){
+                    let id = '#' + this.rightstyle.currentId;
+                    let opacity = e.target.value;
+                    $(id).parent().css('opacity', opacity);
+                },
+                // 矩形宽度修改
+                widthChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let width = e.target.value + 'px';
+                    $(id).parent().css('width', width);
+                },
+                // 矩形高度修改
+                heightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let height = e.target.value + 'px';
+                    $(id).parent().css('height', height);
+                },
+                // 行高
+                lineHeightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let lineHeight = e.target.value + 'px';
+                    $(id).parent().css('line-height', lineHeight);
+                },
+                // 矩形内字体大小修改
+                fontSizeChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontSize = e.target.value + 'px';
+                    $(id).css('font-size', fontSize);
+                },
+                // 矩形内字体粗细修改
+                fontWeightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontWeight = e.target.value;
+                    $(id).css('font-weight', fontWeight);
+                },
+                // 矩形内字体颜色修改
+                fontColorChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontColor = e.target.value;
+
+                    $(id).css('color', fontColor);
+                },
+                // 矩形背景颜色修改
+                backgroundColorChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let backgroundColor = e.target.value;
+                    $(id).css('background-color', backgroundColor);
+                },
+                // 对齐方式修改
+                alignClick(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let alignment = e.target.getAttribute('name');
+                    $(id).parent().css('text-align', alignment);
+                },
+                // 删除矩形
+                deleteItem() {
+                    let id = '#' + this.rightstyle.currentId;
+                    let res = confirm('确定要删除吗？')
+                    if (res) {
+                        $(id).parent().remove();
+                        $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                        $('.attrModuleNullcpn').show();
+
+                    }
+
+                },
+            }
+
+        });
+        // 未选中组件属性
+        let attrModuleNull = Vue.extend({
+            template: '#attrModuleNullcpn',
+        });
+        // 图片属性
+        let imageAttr = Vue.extend({
+            template: '#imageAttrcpn',
+            props: ['rightstyle'],
+            methods: {
+                // 层级修改
+                zindexChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let zindex = e.target.value;
+                    $(id).css('z-index', zindex);
+                },
+                // 透明度修改
+                opacityChange(e){
+                    let id = '#' + this.rightstyle.currentId;
+                    let opacity = e.target.value;
+                    $(id).css('opacity', opacity);
+                },
+                // 矩形宽度修改
+                widthChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let width = e.target.value + 'px';
+                    $(id).css('width', width);
+                },
+                // 矩形高度修改
+                heightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let height = e.target.value + 'px';
+                    $(id).css('height', height);
+                },
+                // 删除视频
+                deleteItem() {
+                    let id = '#' + this.rightstyle.currentId;
+                    let res = confirm('确定要删除吗？')
+                    if (res) {
+                        $(id).remove()
+                        $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                        $('.attrModuleNullcpn').show()
+
+                    }
+
+                }
+            }
+        });
+        // 视频属性
+        let videoAttr = Vue.extend({
+            template: '#videoAttrcpn',
+            props: ['rightstyle'],
+            methods: {
+                // 层级修改
+                zindexChange(e) {
+                    let id = '#videoBox';
+                    let zindex = e.target.value;
+                    $(id).css('z-index', zindex);
+                },
+                // 矩形宽度修改
+                widthChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let width = e.target.value + 'px';
+                    $(id).css('width', width);
+                },
+                // 矩形高度修改
+                heightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let height = e.target.value + 'px';
+                    $(id).css('height', height);
+                },
+                // 删除视频
+                deleteItem() {
+                    let id = '#' + this.rightstyle.currentId;
+                    let res = confirm('确定要删除吗？')
+                    if (res) {
+                        $(id).parent().parent().remove()
+                        $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                        $('.attrModuleNullcpn').show()
+                    }
+                },
+                playModeClick(e) {
+                    let mode = e.target.getAttribute('name');
+                    if (mode == 'true') {
+                        $('#video').attr('loop', true);
+                    } else {
+                        $('#video').attr('loop', false);
+                    }
+                }
+            }
+        });
+        // 会议标题属性
+        let meetingTitleAttr = Vue.extend({
+            template: '#meetingTitleAttrcpn',
+            props: ['rightstyle'],
+            methods: {
+                // 内容变换
+                contentChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    if (e !== undefined) {
+                        let content = e.target.value
+                        // 赋值给当前矩形框
+                        $(id).text(content)
+                    }
+                },
+                // 层级修改
+                zindexChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let zindex = e.target.value;
+                    $(id).css('z-index', zindex);
+                },
+                // 透明度修改
+                opacityChange(e){
+                    let id = '#' + this.rightstyle.currentId;
+                    let opacity = e.target.value;
+                    $(id).css('opacity', opacity);
+                },
+                // 宽度修改
+                widthChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let width = e.target.value + 'px';
+                    $(id).css('width', width);
+                },
+                // 高度修改
+                heightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let height = e.target.value + 'px';
+                    $(id).css('height', height);
+                },
+                // 行高
+                lineHeightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let lineHeight = e.target.value + 'px';
+                    $(id).css('line-height', lineHeight);
+                },
+                // 矩形内字体大小修改
+                fontSizeChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontSize = e.target.value + 'px';
+                    $(id).css('font-size', fontSize);
+                },
+                // 矩形内字体粗细修改
+                fontWeightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontWeight = e.target.value;
+                    $(id).css('font-weight', fontWeight);
+
+                },
+                // 矩形内字体颜色修改
+                fontColorChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontColor = e.target.value;
+
+                    $(id).css('color', fontColor);
+                },
+                // 矩形背景颜色修改
+                backgroundColorChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let backgroundColor = e.target.value;
+                    $(id).css('background-color', backgroundColor);
+                },
+                // 对齐方式修改
+                alignClick(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let alignment = e.target.getAttribute('name');
+                    $(id).css('text-align', alignment);
+                },
+                // 删除标题
+                deleteItem() {
+                    let id = '#' + this.rightstyle.currentId;
+                    let res = confirm('确定要删除吗？')
+                    if (res) {
+                        $(id).remove();
+                        $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                        $('.attrModuleNullcpn').show();
+
+                    }
+
+                }
+            },
+
+        });
+        // 会议列表属性
+        let meetingListAttr = Vue.extend({
+            template: '#meetingListAttrcpn',
+            props: ['rightstyle'],
+            methods: {
+                // 内容变换
+                contentChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    if (e !== undefined) {
+                        let content = e.target.value;
+                        // 赋值给当前矩形框
+                        $(id).children('.meetingListsTitle').children().text(content)
+                    }
+                },
+                // 层级修改
+                zindexChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let zindex = e.target.value;
+                    $(id).css('z-index', zindex);
+                },
+                opacityChange(e){
+                    let id = '#' + this.rightstyle.currentId;
+                    let opacity = e.target.value;
+                    $(id).css('opacity', opacity);
+                },
+                // 宽度修改
+                widthChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let width = e.target.value + 'px';
+                    $(id).css('width', width);
+                },
+                // 高度修改
+                heightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let height = e.target.value + 'px';
+                    $(id).css('height', height);
+                },
+                // 行高
+                lineHeightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let lineHeight = e.target.value + 'px';
+                    $(id).children('.meetingListsTitle').children().css('line-height', lineHeight);
+                },
+                // 矩形内字体大小修改
+                fontSizeChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontSize = e.target.value + 'px';
+                    $(id).children('.meetingListsTitle').children().css('font-size', fontSize);
+                },
+                // 矩形内字体粗细修改
+                fontWeightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontWeight = e.target.value;
+                    $(id).children('.meetingListsTitle').children().css('font-weight', fontWeight);
+
+                },
+                // 矩形内字体颜色修改
+                fontColorChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontColor = e.target.value;
+
+                    $(id).children('.meetingListsTitle').css('color', fontColor);
+                },
+                // 矩形背景颜色修改
+                backgroundColorChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let backgroundColor = e.target.value;
+                    $(id).children('.meetingListsTitle').css('background-color', backgroundColor);
+                },
+                // 对齐方式修改
+                alignClick(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let alignment = e.target.getAttribute('name');
+                    $(id).children('.meetingListsTitle').css('text-align', alignment);
+                },
+                // 删除标题
+                deleteItem() {
+                    let id = '#' + this.rightstyle.currentId;
+                    let res = confirm('确定要删除吗？')
+                    if (res) {
+                        $(id).remove();
+                        $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                        $('.attrModuleNullcpn').show();
+
+                    }
+
+                }
+            },
+
+        });
+        // 参会人员属性
+        let confereeAttr = Vue.extend({
+            template: '#confereeAttrcpn',
+            props: ['rightstyle'],
+            methods: {
+                // 内容变换
+                contentChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    if (e !== undefined) {
+                        let content = e.target.value;
+                        // 赋值给当前矩形框
+                        $(id).children('.confereecpnTitle').children().text(content)
+                    }
+                },
+                // 层级修改
+                zindexChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let zindex = e.target.value;
+                    $(id).css('z-index', zindex);
+                },
+                opacityChange(e){
+                    let id = '#' + this.rightstyle.currentId;
+                    let opacity = e.target.value;
+                    $(id).css('opacity', opacity);
+                },
+                // 宽度修改
+                widthChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let width = e.target.value + 'px';
+                    $(id).css('width', width);
+                },
+                // 高度修改
+                heightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let height = e.target.value + 'px';
+                    $(id).css('height', height);
+                },
+                // 行高
+                lineHeightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let lineHeight = e.target.value + 'px';
+                    $(id).children('.confereecpnTitle').children().css('line-height', lineHeight);
+                },
+                // 矩形内字体大小修改
+                fontSizeChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontSize = e.target.value + 'px';
+                    $(id).children('.confereecpnTitle').children().css('font-size', fontSize);
+                },
+                // 字体粗细修改
+                fontWeightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontWeight = e.target.value;
+                    $(id).children('.confereecpnTitle').children().css('font-weight', fontWeight);
+
+                },
+                // 矩形内字体颜色修改
+                fontColorChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontColor = e.target.value;
+
+                    $(id).children('.confereecpnTitle').css('color', fontColor);
+                },
+                // 矩形背景颜色修改
+                backgroundColorChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let backgroundColor = e.target.value;
+                    $(id).children('.confereecpnTitle').css('background-color', backgroundColor);
+                },
+                // 对齐方式修改
+                alignClick(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let alignment = e.target.getAttribute('name');
+                    $(id).children('.confereecpnTitle').css('text-align', alignment);
+                },
+                // 删除标题
+                deleteItem() {
+                    let id = '#' + this.rightstyle.currentId;
+                    let res = confirm('确定要删除吗？')
+                    if (res) {
+                        $(id).remove();
+                        $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                        $('.attrModuleNullcpn').show();
+
+                    }
+
+                }
+            },
+
+        });
+        // 办公室使用状态属性
+        let officeattr = Vue.extend({
+            template: '#officeAttrcpn',
+            props: ['rightstyle'],
+            methods: {
+                // 内容变换
+                contentChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    if (e !== undefined) {
+                        let content = e.target.value;
+                        // 赋值给当前矩形框
+                        $(id).children('.officeStatus').children('.officeTitle').children().text(content)
+                    }
+                },
+                // 层级修改
+                zindexChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let zindex = e.target.value;
+                    $(id).css('z-index', zindex);
+                },
+                // 透明度修改
+                opacityChange(e){
+                    let id = '#' + this.rightstyle.currentId;
+                    let opacity = e.target.value;
+                    $(id).css('opacity', opacity);
+                },
+                // 宽度修改
+                widthChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let width = e.target.value + 'px';
+                    $(id).css('width', width);
+                },
+                // 高度修改
+                heightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let height = e.target.value + 'px';
+                    $(id).css('height', height);
+                },
+                // 行高
+                lineHeightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let lineHeight = e.target.value + 'px';
+                    $(id).children('.officeStatus').children('.officeTitle').children().css('line-height', lineHeight);
+                },
+                // 矩形内字体大小修改
+                fontSizeChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontSize = e.target.value + 'px';
+                    $(id).children('.officeStatus').children('.officeTitle').children().css('font-size', fontSize);
+                },
+                // 矩形内字体粗细修改
+                fontWeightChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontWeight = e.target.value;
+                    $(id).children('.officeStatus').children('.officeTitle').children().css('font-weight', fontWeight);
+
+                },
+                // 矩形内字体颜色修改
+                fontColorChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let fontColor = e.target.value;
+
+                    $(id).children('.officeStatus').children('.officeTitle').children().css('color', fontColor);
+                },
+                // 矩形背景颜色修改
+                backgroundColorChange(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let backgroundColor = e.target.value;
+                    $(id).children('.officeStatus').css('background-color', backgroundColor);
+                },
+                // 对齐方式修改
+                alignClick(e) {
+                    let id = '#' + this.rightstyle.currentId;
+                    let alignment = e.target.getAttribute('name');
+                    $(id).children('.officeStatus').children('.officeTitle').children().css('text-align', alignment);
+                },
+                // 删除标题
+                deleteItem() {
+                    let id = '#' + this.rightstyle.currentId;
+                    let res = confirm('确定要删除吗？')
+                    if (res) {
+                        $(id).remove();
+                        $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                        $('.attrModuleNullcpn').show();
+
+                    }
+
+                }
+            },
+
+        });
+        // 右键菜单
+        let rightMenu = Vue.extend({
+            template: '#rightMenucpn',
+            data() {
+                return {
+                    rightMenuData: ['删除']
+                }
+            },
+            props: ['rightmenuid'],
+            methods: {
+                deleteClick() {
+                    let id = '#' + this.rightmenuid;
+                    $(id).parent().remove();
+                    $('.rightMenucpn').css('display', 'none');
+                }
+            }
+        });
+
+        let template1 = Vue.extend({
+            template: '#template1',
+            data() {
+                return {
+                    MeetingMessage: [{
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }],
+                    announcementData: ['公告：关于如何提高国民收入第一次会议'],
+                    date: {
+                        week: '',
+                        time: ''
+                    },
+                    weather: {
+                        city: '成都',
+                        temperature: '30℃',
+                        probability: '96%',
+                        windSpeed: '14km/h'
+
+                    },
+                    meetingTitle: {
+                        title1: '测试会议',
+                        title2: '关于人民收入提高，致力于民生发展'
+                    }
+
+                }
+            },
+            props: ['templateName'],
+            methods: {
+                dateFormat(fmt, date) {
+                    let ret;
+                    const opt = {
+                        "Y+": date.getFullYear().toString(), // 年
+                        "m+": (date.getMonth() + 1).toString(), // 月
+                        "d+": date.getDate().toString(), // 日
+                        "H+": date.getHours().toString(), // 时
+                        "M+": date.getMinutes().toString(), // 分
+                        "S+": date.getSeconds().toString(), // 秒,
+                        "week": date.getDay() + 0
+                        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+                    };
+                    switch (opt.week) {
+                        case 0:
+                            this.date.week = "SUb";
+                            break;
+                        case 1:
+                            this.date.week = "Mon";
+                            break;
+                        case 2:
+                            this.date.week = "Tue";
+                            break;
+                        case 3:
+                            this.date.week = "Wed";
+                            break;
+                        case 4:
+                            this.date.week = "Thur";
+                            break;
+                        case 5:
+                            this.date.week = "Fri";
+                            break;
+                        case 6:
+                            this.date.week = "Sat";
+                            break;
+                    }
+                    for (let k in opt) {
+                        ret = new RegExp("(" + k + ")").exec(fmt);
+                        if (ret) {
+                            fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+                        };
+                    };
+                    return fmt;
+                },
+                meetingDraggable() {
+                    $(function () {
+                        $('.meetingTitle,.table1').draggable({
+                            onDrag: function (e) {
+                                var d = e.data;
+                                if (d.left < 0) {
+                                    d.left = 0
+                                }
+                                if (d.top < 0) {
+                                    d.top = 0
+                                }
+                                if (d.left + $(d.target).outerWidth() > $(d.parent).parent().outerWidth()) {
+                                    d.left = $(d.parent).parent().width() - $(d.target).outerWidth();
+                                }
+                                if (d.top + $(d.target).outerHeight() >= $(d.parent).height()) {
+                                    d.top = $(d.parent).height() - $(d.target).outerHeight();
+                                }
+                            }
+                        });
+                        $('.meetingTitle,.table1').resizable()
+
+                        $('.announcement').draggable({
+                            onDrag: function (e) {
+                                var d = e.data;
+                                if (d.left < -10) {
+                                    d.left = -10
+                                }
+                                if (d.top < -20) {
+                                    d.top = -20
+                                }
+                                if (d.left + $(d.target).outerWidth() > $(d.parent).parents('.center').outerWidth() + 10) {
+                                    d.left = $(d.parent).parents('.center').width() - $(d.target).outerWidth() + 10;
+                                }
+                                if (d.top + $(d.target).outerHeight() >= $(d.parent).parents('.temp1left').height() + 20) {
+                                    d.top = $(d.parent).parents('.temp1left').height() - $(d.target).outerHeight() + 20;
+                                }
+                            }
+                        });
+                        $('.timeAndWeather').resizable();
+                        $('.timeAndWeather').draggable({
+                            onDrag: function (e) {
+                                var d = e.data;
+                                if (d.left < 0) {
+                                    d.left = 0
+                                }
+                                if (d.top < 0) {
+                                    d.top = 0
+                                }
+                                if (d.left + $(d.target).outerWidth() > $(d.parent).parents('.center').outerWidth()) {
+                                    d.left = $(d.parent).parents('.center').width() - $(d.target).outerWidth();
+                                }
+                                if (d.top + $(d.target).outerHeight() >= $(d.parent).parents('.temp1left').height()) {
+                                    d.top = $(d.parent).parents('.temp1left').height() - $(d.target).outerHeight();
+                                }
+                            }
+                        })
+                    })
+
+                },
+                // 删除公告
+                deleteAnnouncement(e) {
+                    $(e.target).parent().remove()
+                },
+                // 删除天气和时间
+                deleteWeather(e) {
+                    $(e.target).parents('.timeAndWeather').remove()
+                },
+                // 删除标题
+                deleteMeetingTitle(e) {
+                    $(e.target).parent().remove()
+                    $(' .attrModuleNullcpn,.rectangleAttrcpn,.imageAttrcpn,.videoAttrcpn,.meetingTitleAttrcpn,.meetingListAttrcpn,.confereeAttrcpn,.officeAttrcpn').hide();
+                    $('.attrModuleNullcpn').show()
+                }
+            },
+            created() {
+                this.meetingDraggable();
+                setInterval(() => {
+                    let date = new Date();
+                    let nowTime = this.dateFormat("HH:MM", date);
+                    this.date.time = nowTime;
+                }, 1000);
+            }
+        })
+
+        let template2 = Vue.extend({
+            template: '#template2',
+            data() {
+                return {
+                    MeetingMessage: [{
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }, {
+                        time: '08:00-09:00',
+                        title: '技术交流',
+                        compere: '张三',
+                        reserve: '李四'
+
+                    }],
+                    announcementData: ['公告：关于如何提高国民收入第一次会议'],
+                    date: {
+                        week: '',
+                        day: '',
+                        time: ''
+                    },
+                    weather: {
+                        city: '成都',
+                        temperature: '30℃',
+                        probability: '96%',
+                        windSpeed: '14km/h'
+
+                    },
+                    meetingTitle: {
+                        title1: '测试会议',
+                        meetingStatus: '进行中',
+                        meetingRoom: '商务部:第一会议室',
+                        title2: '关于人民收入提高，致力于民生发展'
+                    },
+                    announcement: {
+                        notice: '关于如何提高国民收入第一次会议',
+                        message: '关于如何提高国民收入第一次会议，关于如何提高国民收入第一次会议'
+                    },
+                }
+            },
+            methods: {
+                dateFormat(fmt, date) {
+                    let ret;
+                    const opt = {
+                        "Y+": date.getFullYear().toString(), // 年
+                        "m+": (date.getMonth() + 1).toString(), // 月
+                        "d+": date.getDate().toString(), // 日
+                        "H+": date.getHours().toString(), // 时
+                        "M+": date.getMinutes().toString(), // 分
+                        "S+": date.getSeconds().toString(), // 秒,
+                        "week": date.getDay() + 0
+                        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+                    };
+                    switch (opt.week) {
+                        case 0:
+                            this.date.week = "SUb";
+                            break;
+                        case 1:
+                            this.date.week = "Mon";
+                            break;
+                        case 2:
+                            this.date.week = "Tue";
+                            break;
+                        case 3:
+                            this.date.week = "Wed";
+                            break;
+                        case 4:
+                            this.date.week = "Thur";
+                            break;
+                        case 5:
+                            this.date.week = "Fri";
+                            break;
+                        case 6:
+                            this.date.week = "Sat";
+                            break;
+                    }
+                    for (let k in opt) {
+                        ret = new RegExp("(" + k + ")").exec(fmt);
+                        if (ret) {
+                            fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+                        };
+                    };
+                    return fmt;
+                }
+            },
+            created() {
+                setInterval(() => {
+                    let date = new Date();
+                    let nowTime = this.dateFormat("HH:MM:SS", date);
+                    this.date.time = nowTime;
+                    let nowDay = this.dateFormat("YYYY-mm-dd", date);
+                    this.date.day = nowDay
+                }, 1000);
+            },
+        })
+    </script>
+
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                selectedData: [],
+                saveData: '',
+                quickSelctedData: [],
+                quickSelctedTitleData: [],
+                rectangleLeft: 0,
+                rectangleAllStyle: {},
+                imageAllStyle: {},
+                videoAllStyle: {},
+                meetingTitleAllStyle: {},
+                meetingListsAllStyle: {},
+                confereeAllStyle: {},
+                officeAllStyle: {},
+                // 右键菜单触发者id
+                rightMenuId: '',
+                templateName: ''
+            },
+            methods: {
+                // drag方法开始
+                // 拖拽开始执行函数
+                dragstart(ev) {
+                    ev.dataTransfer.setData(" Text ", ev.target.id);
+                    // 获取设置的name属性
+                    this.saveData = ev.target.getAttribute('name')
+                    // 给图片设置不同的id
+                    index = $('.imageLabel').length - 1;
+                    id = 'imageLabel' + index;
+                    let allImageLabel = $('.imageLabel')
+                    if ($('.imageLabel').length >= 1) {
+                        allImageLabel[index].setAttribute('id', id);
+                    }
+                },
+                // 拖拽放下触发函数
+                drop(ev) {
+                    // 阻止默认事件
+                    ev.preventDefault();
+                    // 把在dragstart事件中得到的saveData赋值给selectedData
+                    let length = $('.videocpn').length;
+                    if (this.selectedData.indexOf('myvideo') !== -1 && this.saveData == 'myvideo' && length !== 0) {
+                        this.saveData = ""
+                        alert('只能插入一个视频')
+                        return
+                    }
+                    this.selectedData.push(this.saveData);
+
+                    //    清空saveData
+
+                    this.saveData = "";
+
+                },
+                // drag方法结束
+                // 模板选择点击触发
+                templateClick(e) {
+                    let currentName = e.target.getAttribute('name');
+                    if (currentName == 'defaultTemplate') {
+                        $('.template1,.template2').hide()
+                        $('.weathercpn').show()
+                    } else {
+                        this.templateName = currentName
+                        $('.weathercpn').hide()
+                        $('.template1').show()
+                    }
+
+                },
+                // 快速选择触发
+                handleClick(e) {
+                    let name = e.target.getAttribute('name');
+
+                    if (name !== 'mymeetingtitle') {
+                        this.quickSelctedData.push(name)
+
+                    } else {
+
+                        this.quickSelctedTitleData.push(name)
+                    }
+
+                },
+                // 接收矩形子传值
+                getRetangleClick(rectangleStyle) {
+                    this.rectangleAllStyle = rectangleStyle
+                },
+                // 接收图片子传值
+                getImageClick(imageStyle) {
+                    this.imageAllStyle = imageStyle;
+
+                },
+                // 接收视频子传值
+                getVideoClick(videoStyle) {
+                    this.videoAllStyle = videoStyle;
+
+                },
+                // 接收会议标题子传值
+                getTitleClick(meetingTitleStyle) {
+                    this.meetingTitleAllStyle = meetingTitleStyle
+                },
+                // 接收会议列表子传值
+                getListsClick(meetingListsStyle) {
+                    this.meetingListsAllStyle = meetingListsStyle
+                },
+                // 接收参会人员子传值
+                getConfereeClick(confereeStyle) {
+                    this.confereeAllStyle = confereeStyle;
+                },
+                // 接收办公室使用状态子传值
+                officeClick(officeStyle) {
+                    this.officeAllStyle = officeStyle
+                },
+                // 背景颜色修改
+                handleCanvaChange(e) {
+                    let color = e.target.value
+                    $('.center').css('background-color', color)
+                },
+                // 接收图片label右键传过来的id
+                getImageLabelId(imageLabelId) {
+                    this.rightMenuId = imageLabelId
+                },
+                getVideoLabelId(videoLabelId) {
+                    this.rightMenuId = videoLabelId
+                },
+                // 预览按钮
+                previewClick() {
+                    $('*').draggable({
+                        'disabled': true
+                    });
+                    $('*').resizable({
+                        'disabled': true
+                    });
+                    $('.head').hide();
+                    $('.left').hide();
+                    $('.right').hide();
+                    $('.tempalte1').show();
+                    $('.closePre').show();
+                    $('.center').css({
+                        'position': 'fixed',
+                        'width': '63.8%',
+                        'height': '100%',
+                        'top': '50%',
+                        'left': '50%',
+                        'transform': 'translate(-50%,-50%)',
+                        'box-shadow': '10px 10px 10px #888888'
+                    });
+
+                },
+
+                // 退出预览
+                quitClick() {
+                    $('.weather,.nowTime,.rectanglecpn,.imagecpn,#videoBox,.meetingTitlecpn,.meetingListscpn,.officecpn,.confereecpn').draggable({
+                        'disabled': false
+                    });
+                    $('.weather,.nowTime,.rectanglecpn,.imagecpn,#videoBox,.meetingTitlecpn,.meetingListscpn,.officecpn,.confereecpn').resizable({
+                        'disabled': false
+                    });
+                    $('.center').animate({
+                        width: '100%',
+                        height: '100%'
+                    })
+                    $('.head').show();
+                    $('.left').show();
+                    $('.right').show();
+                    if (this.templateName == '') {
+                        $('.weathercpn').show();
+                    }
+
+                    $('.closePre').hide();
+                    $('.center').css({
+                        'position': '',
+                        'top': '',
+                        'left': '',
+                        'transform': '',
+                        'box-shadow': ''
+                    });
+
+                },
+                // 发布
+                publishClick(){
+                  let canvaValue=  $('.center').html();
+                }
+
+
+
+            },
+            created() {
+                document.oncontextmenu = function (e) {
+                    e.preventDefault();
+                };
+            },
+            components: {
+                myweathercpn: weather,
+                myrectangle: rectangle,
+                myimage: image,
+                myvideo: video,
+                mymeetingtitle: meetingTitle,
+                mymeetinglists: meetingLists,
+                myoffice: office,
+                myconferee: confereeContent,
+                myrectangleattr: rectangleAttr,
+                myattrmodulenull: attrModuleNull,
+                myimageattr: imageAttr,
+                myvideoattr: videoAttr,
+                mymeetingtitleattr: meetingTitleAttr,
+                mymeetinglistattr: meetingListAttr,
+                myconfereeattr: confereeAttr,
+                myofficeattr: officeattr,
+                myrightmenu: rightMenu,
+                mytemplate1: template1,
+                mytemplate2: template2,
+
+
+            }
+        });
+    </script>
+
+</body>
+
+</html>

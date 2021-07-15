@@ -1,0 +1,891 @@
+html,
+body {
+  height: 96.6%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+@media screen and (min-width: 1600px) {
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}
+li {
+  list-style: none;
+}
+.icons_lists {
+  display: flex;
+  padding: 0;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+.icons_lists li {
+  display: flex;
+  border: 1px solid #ddd;
+  padding: 2px;
+  cursor: move;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.icons_lists li .icon {
+  font-size: 22px;
+  margin-right: 2px;
+}
+.icons_lists li .name {
+  font-size: 15px;
+  line-height: 30px;
+  font-weight: 600;
+}
+.clearfix:after {
+  content: "";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+.clearfix {
+  *zoom: 1;
+  /*ie6清除浮动的方式 *号只有IE6-IE7执行，其他浏览器不执行*/
+}
+#app {
+  width: 100%;
+  height: 100%;
+}
+#app .container {
+  width: 100%;
+  padding: 0;
+  height: 100%;
+}
+#app .container .head {
+  padding: 15px;
+  margin: 0;
+  overflow: hidden;
+  background-color: #7A8B8B;
+  align-items: center;
+  color: #fff;
+  z-index: 0;
+  position: relative;
+  font-size: 20px;
+}
+#app .container .main {
+  display: flex;
+  justify-content: start;
+  height: 100%;
+}
+#app .container .main .left {
+  margin-top: 30px;
+  z-index: 10;
+  flex: 2;
+  background-color: #fff;
+}
+#app .container .main .left .dropdown {
+  width: 100%;
+  margin-left: 6%;
+  margin-top: 40px;
+}
+#app .container .main .left .dropdown .dropdown-menu a {
+  cursor: default;
+}
+#app .container .main .left .dropdown button {
+  background-color: #00355F;
+  color: #fff;
+  outline: none;
+}
+#app .container .main .left .canvaColor {
+  margin-left: 6%;
+  margin-top: 40px;
+}
+#app .container .main .left .canvaColor span {
+  font-size: 20px;
+}
+#app .container .main .left #preview {
+  margin-top: 40px;
+  margin-left: 6%;
+  font-size: 20px;
+  color: #fff;
+  background-color: #00355F;
+  text-align: center;
+}
+#app .container .main .left #publish {
+  margin-top: 40px;
+  margin-left: 10%;
+  font-size: 20px;
+  color: #fff;
+  background-color: #00355F;
+  text-align: center;
+}
+#app .container .main .center {
+  width: 100%;
+  height: 100vh;
+  color: #fff;
+  flex: 7;
+  position: relative;
+  background-color: #00355F;
+}
+#app .container .main .center .rightMenucpn {
+  display: none;
+  width: 100px;
+  position: absolute;
+  z-index: 9999;
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  background-color: #fff;
+  margin: 0;
+  text-align: center;
+}
+#app .container .main .center .rightMenucpn ul {
+  padding: 0;
+  border-radius: 20px;
+}
+#app .container .main .center .rightMenucpn ul li {
+  padding-top: 10px;
+  cursor: pointer;
+}
+#app .container .main .center .rightMenucpn ul li:hover {
+  color: #00355F;
+}
+#app .container .main .center .closePre {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  color: #000;
+  display: none;
+}
+#app .container .main .center .weathercpn {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #4694A8;
+  height: 120px;
+}
+#app .container .main .center .weathercpn:hover .deleteWeather {
+  display: block;
+}
+#app .container .main .center .weathercpn .deleteWeather {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  color: #000;
+  display: none;
+}
+#app .container .main .center .weathercpn .nowTime {
+  position: absolute;
+  left: 0;
+  font-size: 25px;
+  z-index: 1;
+}
+#app .container .main .center .weathercpn .weather {
+  margin-right: 50px;
+  z-index: 1;
+  position: absolute;
+  right: 0;
+}
+#app .container .main .center .weathercpn .weather ul li:nth-child(1) {
+  font-size: 20px;
+  font-weight: 500;
+}
+#app .container .main .center .weathercpn .weather ul li:nth-child(2) .nowNum {
+  font-size: 35px;
+  font-weight: 600;
+}
+#app .container .main .center .rectanglecpn {
+  z-index: 1;
+  position: absolute;
+  overflow: auto;
+  color: #000;
+  height: 300px;
+  width: 400px;
+  font-size: 20px;
+  top: 35%;
+  left: 35%;
+}
+#app .container .main .center .rectanglecpn div[id*=eidtableArea] {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  background-color: #fff;
+}
+#app .container .main .center .videocpn #video_file {
+  display: none;
+  margin: 20px;
+}
+#app .container .main .center .videocpn #videoBox {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  z-index: 1;
+}
+#app .container .main .center .videocpn #videoBox #video {
+  z-index: 1;
+}
+#app .container .main .center .videocpn .videoLabel {
+  width: 290px;
+  display: flex;
+  color: yellow;
+  position: absolute;
+  top: 40%;
+  left: 35%;
+  z-index: 999;
+}
+#app .container .main .center .videocpn .videoLabel .video {
+  font-size: 60px;
+  margin-right: 3px;
+}
+#app .container .main .center .videocpn .videoLabel .text {
+  font-size: 25px;
+  align-self: center;
+}
+#app .container .main .center .imagecpn input {
+  display: none;
+}
+#app .container .main .center .imagecpn #id_myfile {
+  margin: 20px;
+}
+#app .container .main .center .imagecpn .imageLabel {
+  display: flex;
+  color: orange;
+  position: absolute;
+  top: 40%;
+  left: 25%;
+  z-index: 999;
+}
+#app .container .main .center .imagecpn .imageLabel .picture {
+  font-size: 60px;
+  margin-right: 3px;
+}
+#app .container .main .center .imagecpn .imageLabel .text {
+  font-size: 25px;
+  align-self: center;
+}
+#app .container .main .center .imagecpn .id_img {
+  width: 450px;
+  height: 400px;
+  position: absolute;
+  top: 40%;
+  left: 25%;
+  z-index: 1;
+}
+#app .container .main .center .template1 {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+#app .container .main .center .template1 .container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+#app .container .main .center .template1 .container .temp1left {
+  margin-top: 0;
+  flex: 4;
+  height: 100vh;
+  background-color: #fff;
+}
+#app .container .main .center .template1 .container .temp1left .table1 {
+  height: 60vh;
+  overflow: auto;
+  background-color: #fff;
+}
+#app .container .main .center .template1 .container .temp1left .table1 .table .thead {
+  background-color: #4694A8;
+  color: #fff;
+}
+#app .container .main .center .template1 .container .temp1left .table1 .table .thead tr th {
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 4px;
+  text-align: center;
+}
+#app .container .main .center .template1 .container .temp1left .table1 .table .tbody1 .tr1 td {
+  border-bottom: 1px solid #4694A8;
+  letter-spacing: 2px;
+  font-size: 20px;
+  color: #4694A8;
+  text-align: center;
+  padding: 15px 0;
+}
+#app .container .main .center .template1 .container .temp1left .table1 .table .tbody1 .tr2 td {
+  border-bottom: 1px solid #4694A8;
+  letter-spacing: 2px;
+  font-size: 20px;
+  color: #4694A8;
+  text-align: center;
+  padding: 15px;
+}
+#app .container .main .center .template1 .container .temp1left .table2 {
+  border-top: none;
+  margin-top: 18px;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 {
+  border-top: 1px solid #4694A8;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .announcement {
+  position: relative;
+  border: none;
+  width: 27vw;
+  opacity: 0.9;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .announcement:hover .deleteAnnouncement {
+  display: block;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .announcement .deleteAnnouncement {
+  position: absolute;
+  top: 18px;
+  right: 9px;
+  z-index: 100;
+  width: 18px;
+  height: 20px;
+  padding: 0;
+  color: #000;
+  display: none;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .announcement p {
+  background-color: #4694A8;
+  border-radius: 30px;
+  color: #fff;
+  padding: 15px;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 20px;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .line {
+  border-top: none;
+  border-bottom: none;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .line span {
+  display: inline-block;
+  width: 80%;
+  border-radius: 15px;
+  height: 5px;
+  background-color: #4694A8;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather {
+  opacity: 0.9;
+  filter: opacity(opacity=90);
+  position: relative;
+  width: 26vw;
+  background-color: #4694A8;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather:hover .deleteWeather {
+  display: block;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .deleteWeather {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  color: #000;
+  display: none;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .week {
+  padding: 15px;
+  padding-top: 20px;
+  color: #fff;
+  border-right: 5px solid #B5D4DC;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .week .day {
+  font-size: 40px;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .week .time {
+  font-size: 27px;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .temp1Weather {
+  color: #fff;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .temp1Weather .divWeather {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2vw;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .temp1Weather .divWeather .city {
+  font-size: 1.5vw;
+  width: 40%;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .temp1Weather .divWeather .temperature {
+  font-size: 1.5vw;
+  width: 40%;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .temp1Weather .divWeather .probability {
+  width: 40%;
+  font-size: 1.5vw;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .temp1Weather .divWeather .probability .iconfont {
+  font-size: 1.5vw;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .temp1Weather .divWeather .windSpeed {
+  width: 40%;
+  font-size: 1.5vw;
+  display: flex;
+}
+#app .container .main .center .template1 .container .temp1left .table2 .tbody2 .timeAndWeather .temp1Weather .divWeather .windSpeed .iconfont {
+  font-size: 1.5vw;
+}
+#app .container .main .center .template1 .container .temp1Right {
+  flex: 5;
+  height: 100vh;
+  background-image: url('../images/background.jpg');
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#app .container .main .center .template1 .container .temp1Right .meetingTitle {
+  width: 30vw;
+  background-color: #4694A8;
+  padding: 50px;
+  border-radius: 20px;
+  opacity: 0.9;
+  filter: opacity(opacity=90);
+  position: relative;
+  /* IE8 及更早版本 */
+}
+#app .container .main .center .template1 .container .temp1Right .meetingTitle:hover .deleteMeetingTitle {
+  display: block;
+}
+#app .container .main .center .template1 .container .temp1Right .meetingTitle .deleteMeetingTitle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  color: #000;
+  display: none;
+}
+#app .container .main .center .template1 .container .temp1Right .meetingTitle .title1 {
+  letter-spacing: 5px;
+  font-size: 35px;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+}
+#app .container .main .center .template1 .container .temp1Right .meetingTitle .title2 {
+  letter-spacing: 5px;
+  font-size: 20px;
+  color: #fff;
+  text-align: center;
+}
+#app .container .main .center .template2 {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+#app .container .main .center .template2 .container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+#app .container .main .center .template2 .container .temp2Left {
+  height: 100%;
+  flex: 10;
+  background-image: url('../images/background.jpg');
+  background-size: cover;
+}
+#app .container .main .center .template2 .container .temp2Right {
+  height: 100%;
+  flex: 7;
+  display: flex;
+  flex-direction: column;
+  background-image: linear-gradient(#0371B8, #00BBC1);
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Weather {
+  flex: 2;
+  border-bottom: 2px dashed #fff;
+  font-size: 20px;
+  color: #fff;
+  display: flex;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Weather .liFather {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  align-self: center;
+  flex-wrap: wrap;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Weather .liFather li:nth-child(1) {
+  font-size: 35px;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Weather .liFather li:nth-child(2) {
+  font-size: 35px;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Weather .liFather li:nth-child(4) {
+  font-size: 30px;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Weather .liFather li {
+  flex: 33.33%;
+  margin-top: 20px;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Title {
+  flex: 3;
+  position: relative;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Title .mettingTitle ul span:nth-child(1) {
+  display: inline-block;
+  margin-top: 10px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 25px;
+  letter-spacing: 3px;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Title .mettingTitle ul span:nth-child(2) {
+  background-color: #fff;
+  color: #0371B8;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 4px;
+  border-radius: 10px;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Title .mettingTitle ul span:nth-child(3) {
+  position: absolute;
+  right: 0;
+  padding-right: 20px;
+  padding-left: 5px;
+  background-color: #fff;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #0371B8;
+  margin-top: 18px;
+  border-radius: 10px;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Title .mettingTitle ul li:nth-child(2) {
+  margin-top: 10px;
+  color: #fff;
+  font-size: 17px;
+  letter-spacing: 2px;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Title .announcement {
+  overflow: auto;
+  background-color: #fff;
+  height: 22vh;
+  width: 90%;
+  margin: 0 auto;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Title .announcement .slotLine {
+  height: 110px;
+  border-left: 2px solid #BEC7D7;
+  position: absolute;
+  top: 20px;
+  left: 30px;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Title .announcement .slotLine .cicle1 {
+  position: absolute;
+  top: 0px;
+  left: -6px;
+  border-radius: 10px;
+  list-style: none;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #cccccc;
+  background: #BEC7D7;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Title .announcement .slotLine .cicle2 {
+  position: absolute;
+  top: 100px;
+  left: -6px;
+  border-radius: 10px;
+  list-style: none;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #cccccc;
+  background: #BEC7D7;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Title .announcement .notice {
+  position: absolute;
+  top: 10px;
+  font-size: 15px;
+  color: #0371B8;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Title .announcement .message {
+  position: absolute;
+  top: 100px;
+  font-size: 15px;
+  color: #0371B8;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Table {
+  flex: 4;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  overflow: auto;
+  width: 90%;
+  height: 40vh;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Table .table {
+  height: 100%;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Table .table .thead {
+  background-color: #0371B8;
+  color: #fff;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Table .table .thead tr th {
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 4px;
+  text-align: center;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Table .table .tbody {
+  height: 300px;
+  background-color: #fff;
+}
+#app .container .main .center .template2 .container .temp2Right .temp2Table .table .tbody .tr td {
+  border-bottom: 1px solid #0371B8;
+  font-weight: 600;
+  font-size: 14px;
+  color: #4694A8;
+  text-align: center;
+  padding: 15px 0;
+}
+#app .container .main .quickSelect .meetingTitlecpn {
+  position: relative;
+  z-index: 1;
+  background: #4694A8;
+  width: 300px;
+  height: 100px;
+  font-size: 25px;
+  text-align: center;
+}
+#app .container .main .quickSelect .listsAndStatus {
+  display: flex;
+  border: 2px;
+}
+#app .container .main .quickSelect .listsAndStatus .meetingListscpn {
+  position: relative;
+  background-color: #fff;
+  overflow: auto;
+  height: 400px;
+  z-index: 1;
+}
+#app .container .main .quickSelect .listsAndStatus .meetingListscpn:hover .deleteMeetingLists {
+  display: block;
+}
+#app .container .main .quickSelect .listsAndStatus .meetingListscpn .deleteMeetingLists {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  color: #000;
+  display: none;
+}
+#app .container .main .quickSelect .listsAndStatus .meetingListscpn .meetingListsTitle {
+  text-align: center;
+  background-color: #4694A8;
+  padding: 10px 0;
+}
+#app .container .main .quickSelect .listsAndStatus .meetingListscpn .meetingListsTitle h2 {
+  margin: 5px;
+}
+#app .container .main .quickSelect .listsAndStatus .meetingListscpn .meetingListsContent {
+  padding: 5px;
+  color: #000;
+}
+#app .container .main .quickSelect .listsAndStatus .meetingListscpn .meetingListsContent ul {
+  padding: 0;
+  font-size: 16px;
+}
+#app .container .main .quickSelect .listsAndStatus .meetingListscpn .meetingListsContent ul li {
+  font-size: 25px;
+  padding: 10px 0;
+  border-bottom: 1px solid #4694A8;
+}
+#app .container .main .quickSelect .listsAndStatus .confereecpn {
+  position: relative;
+  background-color: #fff;
+  width: 400px;
+  overflow: auto;
+  z-index: 1;
+}
+#app .container .main .quickSelect .listsAndStatus .confereecpn:hover .deleteConferee {
+  display: block;
+}
+#app .container .main .quickSelect .listsAndStatus .confereecpn .deleteConferee {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  color: #000;
+  display: none;
+}
+#app .container .main .quickSelect .listsAndStatus .confereecpn .confereecpnTitle {
+  text-align: center;
+  background-color: #4694A8;
+  padding: 10px 0;
+}
+#app .container .main .quickSelect .listsAndStatus .confereecpn .confereecpnTitle h2 {
+  margin: 5px;
+}
+#app .container .main .quickSelect .listsAndStatus .confereecpn .confereeContent {
+  text-align: center;
+  color: #000;
+}
+#app .container .main .quickSelect .listsAndStatus .confereecpn .confereeContent ul {
+  overflow: auto;
+  padding: 0;
+  font-size: 16px;
+}
+#app .container .main .quickSelect .listsAndStatus .confereecpn .confereeContent ul li {
+  margin: 5px;
+  float: left;
+  font-size: 20px;
+}
+#app .container .main .quickSelect .listsAndStatus .officecpn {
+  position: relative;
+  background-color: #fff;
+  height: 450px;
+  width: 430px;
+  overflow: auto;
+  z-index: 1;
+}
+#app .container .main .quickSelect .listsAndStatus .officecpn:hover .deleteOffice {
+  display: block;
+}
+#app .container .main .quickSelect .listsAndStatus .officecpn .deleteOffice {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  color: #000;
+  display: none;
+}
+#app .container .main .quickSelect .listsAndStatus .officecpn .officeStatus {
+  text-align: center;
+  background-color: skyblue;
+  padding: 10px 0;
+}
+#app .container .main .quickSelect .listsAndStatus .officecpn .nextStatus {
+  color: #000;
+  text-align: center;
+}
+#app .container .main .quickSelect .listsAndStatus .officecpn .nextStatus .table1 .table .thead {
+  background-color: #4694A8;
+  color: #fff;
+}
+#app .container .main .quickSelect .listsAndStatus .officecpn .nextStatus .table1 .table .thead tr th {
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 4px;
+  text-align: center;
+}
+#app .container .main .quickSelect .listsAndStatus .officecpn .nextStatus .table1 .table .tbody1 {
+  height: 300px;
+}
+#app .container .main .quickSelect .listsAndStatus .officecpn .nextStatus .table1 .table .tbody1 .tr1 td {
+  border-bottom: 1px solid #4694A8;
+  letter-spacing: 2px;
+  font-size: 20px;
+  color: #4694A8;
+  text-align: center;
+  padding: 15px 0;
+}
+#app .container .main .quickSelect .listsAndStatus .officecpn .nextStatus ul {
+  padding: 0;
+  font-size: 16px;
+}
+#app .container .right {
+  z-index: 10;
+  flex: 2;
+  background-color: #fff;
+}
+#app .container .right .attrModuleNullcpn .title {
+  font-size: 25px;
+  color: #627280;
+  text-align: center;
+  font-weight: 600;
+}
+#app .container .right .attrModuleNullcpn .selectComponent {
+  font-size: 20px;
+  text-align: center;
+}
+#app .container .right .rectangleAttrcpn,
+#app .container .right .imageAttrcpn,
+#app .container .right .videoAttrcpn,
+#app .container .right .meetingTitleAttrcpn,
+#app .container .right .meetingListAttrcpn,
+#app .container .right .confereeAttrcpn,
+#app .container .right .officeAttrcpn {
+  display: none;
+}
+#app .container .right span {
+  display: inline-block;
+  margin-bottom: 5px;
+  font-size: 20px;
+}
+#app .container .right .title {
+  font-size: 25px;
+  color: #627280;
+  text-align: center;
+  font-weight: 600;
+  border-bottom: 2px solid #ccc;
+}
+#app .container .right .content {
+  margin: 5px 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+#app .container .right .content textarea {
+  width: 100%;
+  height: 100px;
+}
+#app .container .right .opacity,
+#app .container .right .zindex,
+#app .container .right .fontSize,
+#app .container .right .fontWeight,
+#app .container .right .fontColor,
+#app .container .right .width,
+#app .container .right .height,
+#app .container .right .lineHeight,
+#app .container .right .backGroundColor,
+#app .container .right .alignment,
+#app .container .right .delete {
+  margin: 0px 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+#app .container .right .fontColor .dropdown-menu,
+#app .container .right .backGroundColor .dropdown-menu {
+  width: 30px;
+}
+#app .container .right .fontColor .dropdown-menu a,
+#app .container .right .backGroundColor .dropdown-menu a {
+  cursor: default;
+}
+#app .container .right .meetingTitleAttrcpn .delete button,
+#app .container .right .rectangleAttrcpn .delete button,
+#app .container .right .meetingListAttrcpn .delete button,
+#app .container .right .confereeAttrcpn .delete button,
+#app .container .right .officeAttrcpn .delete button {
+  width: 90px;
+  color: #fff;
+  font-size: 20px;
+  position: relative;
+  left: 60%;
+  bottom: 50px;
+  background-color: red;
+}
+#app .container .right .delete button {
+  width: 90px;
+  color: #fff;
+  font-size: 20px;
+  background-color: #FF0000;
+}
